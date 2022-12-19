@@ -305,10 +305,6 @@
 <span id="305">305</span>
 <span id="306">306</span>
 <span id="307">307</span>
-<span id="308">308</span>
-<span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
 </pre><pre class="rust"><code><span class="doccomment">//! measurements coming from the sensor
 
 </span><span class="kw">use </span>core::f32::consts::FRAC_PI_2;
@@ -432,14 +428,10 @@
         <span class="comment">// First calculate the positions of the zone measurements
         </span><span class="kw">let </span><span class="kw-2">mut </span>zones_pos = [[CoordsSpherical::invalid(); RES_X]; RES_Y];
 
-        <span class="kw">for </span>pos_y <span class="kw">in </span><span class="number">0</span>..RES_Y {
-            <span class="kw">for </span>pos_x <span class="kw">in </span><span class="number">0</span>..RES_X {
-                zones_pos[pos_y][pos_x] = dist_position_spher::&lt;RES_X, RES_Y&gt;(
-                    <span class="self">self</span>.zone_dist[pos_y][pos_x],
-                    pos_x,
-                    pos_y,
-                    params,
-                );
+        <span class="kw">for </span>(pos_y, row) <span class="kw">in </span><span class="self">self</span>.zone_dist.iter().enumerate() {
+            <span class="kw">for </span>(pos_x, zone) <span class="kw">in </span>row.iter().enumerate() {
+                zones_pos[pos_y][pos_x] =
+                    dist_position_spher::&lt;RES_X, RES_Y&gt;(<span class="kw-2">*</span>zone, pos_x, pos_y, params);
             }
         }
 
