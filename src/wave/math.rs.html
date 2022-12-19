@@ -310,14 +310,27 @@
 <span id="310">310</span>
 <span id="311">311</span>
 <span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
 </pre><pre class="rust"><code><span class="doccomment">//! helper math functions to prepare measurements, convert coordinates, etc.
 
+/// Cartesian coordinates
 </span><span class="attribute">#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 </span><span class="kw">pub struct </span>CoordsCartesian {
-    <span class="kw">pub </span>x: f32,
-    <span class="kw">pub </span>y: f32,
-    <span class="kw">pub </span>z: f32,
+    <span class="doccomment">/// The distance to the origin on the x-axis
+    </span><span class="kw">pub </span>x: f32,
+    <span class="doccomment">/// The distance to the origin on the z-axis
+    </span><span class="kw">pub </span>y: f32,
+    <span class="doccomment">/// The distance to the origin on the y-axis
+    </span><span class="kw">pub </span>z: f32,
 }
 
 <span class="kw">impl </span>From&lt;CoordsSpherical&gt; <span class="kw">for </span>CoordsCartesian {
@@ -331,7 +344,8 @@
 }
 
 <span class="kw">impl </span>CoordsCartesian {
-    <span class="kw">pub fn </span>zero() -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// The origin
+    </span><span class="kw">pub fn </span>zero() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             x: <span class="number">0.0</span>,
             y: <span class="number">0.0</span>,
@@ -339,7 +353,8 @@
         }
     }
 
-    <span class="kw">pub fn </span>dist_to(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; f32 {
+    <span class="doccomment">/// Calculates the eucledian distance to other coordinates
+    </span><span class="kw">pub fn </span>dist_to(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; f32 {
         libm::sqrtf(
             libm::powf(<span class="self">self</span>.x - other.x, <span class="number">2.0</span>)
                 + libm::powf(<span class="self">self</span>.y - other.y, <span class="number">2.0</span>)
@@ -373,7 +388,8 @@
 }
 
 <span class="kw">impl </span>CoordsSpherical {
-    <span class="kw">pub fn </span>invalid() -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// Returns invalid coorindates ( r is set to -1.0 )
+    </span><span class="kw">pub fn </span>invalid() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             r: -<span class="number">1.0</span>,
             theta: <span class="number">0.0</span>,
@@ -381,11 +397,13 @@
         }
     }
 
-    <span class="kw">pub fn </span>is_invalid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+    <span class="doccomment">/// Checks if the coorindate is invalid ( r is -1.0 )
+    </span><span class="kw">pub fn </span>is_invalid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.r &lt; <span class="number">0.0
     </span>}
 
-    <span class="kw">pub fn </span>zero() -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// Returns the origin coordinates (r, theta and phi are set to 0.0 )
+    </span><span class="kw">pub fn </span>zero() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             r: <span class="number">0.0</span>,
             theta: <span class="number">0.0</span>,

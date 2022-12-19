@@ -320,6 +320,10 @@
 <span id="320">320</span>
 <span id="321">321</span>
 <span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
 </pre><pre class="rust"><code><span class="doccomment">//! the main entry point in the library.
 //!
 //! All distance values are considered to be in millimeter
@@ -395,9 +399,12 @@
 #[non_exhaustive]
 #[derive(Debug, Clone, Copy)]
 </span><span class="kw">pub enum </span>RecognizerStatus {
-    RecognizerStatusOk = <span class="number">0</span>,
-    RecognizerStatusInitFailure,
-    RecognizerStatusInvalidInput,
+    <span class="doccomment">/// Ok
+    </span>RecognizerStatusOk = <span class="number">0</span>,
+    <span class="doccomment">/// Indicates a failure to initialize the recognizer
+    </span>RecognizerStatusInitFailure,
+    <span class="doccomment">/// Indicates invalid input to the recognizer
+    </span>RecognizerStatusInvalidInput,
 }
 
 <span class="attribute">#[repr(C)]
@@ -408,7 +415,7 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="kw">const </span>RES_X: usize, <span class="kw">const </span>RES_Y: usize&gt; HistoryEntry&lt;RES_X, RES_Y&gt; {
-    <span class="kw">pub fn </span>empty() -&gt; <span class="self">Self </span>{
+    <span class="kw">pub fn </span>invalid() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             measurement: SensorMeasurement::invalid(),
             hand_state: HandState::HandNotFound,
@@ -444,10 +451,11 @@
         .filter(<span class="kw">move </span>|e| now - e.measurement.time_ms &gt;= older_eq_ms)
 }
 
-<span class="doccomment">/// DO NOT MODIFY
+<span class="doccomment">/// The history size.
 ///
-/// This is not meant to be part of the public API, but needs to be exposed to make the C bindings work.  
-/// Must be at least ca. 10 to be able to reliably recognize gestures.
+/// For users of the C bindings: Do not modify!
+/// This is not meant to be part of the public API, but needs to be exposed to make const generics work.  
+/// Is at least ca. 10 to be able to reliably recognize gestures.
 </span><span class="kw">pub const </span>HISTORY_SIZE: usize = <span class="number">60</span>;
 
 <span class="doccomment">/// The gesture recognizer. Is initially configured through parameters and gets fed measurements and time and predicts gestures based on its input.
@@ -464,7 +472,7 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="kw">const </span>RES_X: usize, <span class="kw">const </span>RES_Y: usize&gt; GestureRecognizer&lt;RES_X, RES_Y&gt; {
-    <span class="doccomment">/// A new gesture recognizer initialized with default parameters wherever possible.
+    <span class="doccomment">/// A new gesture recognizer initialized with default parameters.
     ///
     /// The sensor parameters must be provided by the user. There are preconfigured defaults for common TOF-Sensors
     </span><span class="kw">pub fn </span>new(sensor_params: SensorParams) -&gt; <span class="self">Self </span>{
@@ -472,7 +480,7 @@
             params: RecognizerParams::default(),
             sensor_params,
             start_time: <span class="number">0</span>,
-            history: [HistoryEntry::empty(); HISTORY_SIZE],
+            history: [HistoryEntry::invalid(); HISTORY_SIZE],
             received_measurements: <span class="number">0</span>,
         }
     }
@@ -539,10 +547,10 @@
         <span class="self">self</span>.received_measurements += <span class="number">1</span>;
     }
 
-    <span class="doccomment">/// Clears the history and fills it with empty measurements and state (all dist values = -1.0)
+    <span class="doccomment">/// Clears the history and fills it with invalid measurements and state (all dist values = -1.0)
     </span><span class="kw">fn </span>clear_history(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">for </span>entry <span class="kw">in </span><span class="self">self</span>.history.iter_mut() {
-            <span class="kw-2">*</span>entry = HistoryEntry::empty();
+            <span class="kw-2">*</span>entry = HistoryEntry::invalid();
         }
 
         <span class="self">self</span>.received_measurements = <span class="number">0</span>;

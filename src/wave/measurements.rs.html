@@ -305,17 +305,33 @@
 <span id="305">305</span>
 <span id="306">306</span>
 <span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
 </pre><pre class="rust"><code><span class="doccomment">//! measurements coming from the sensor
 
 </span><span class="kw">use </span>core::f32::consts::FRAC_PI_2;
 
 <span class="kw">use </span><span class="kw">crate</span>::math::{CoordsCartesian, CoordsSpherical};
 
-<span class="attribute">#[repr(C)]
+<span class="doccomment">/// The Hand state.
+///
+/// When found, contains the hand position in spherical coordinates
+</span><span class="attribute">#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 </span><span class="kw">pub enum </span>HandState {
-    HandNotFound,
-    HandFound { hand_pos: CoordsSpherical },
+    <span class="doccomment">/// No hand was found
+    </span>HandNotFound,
+    <span class="doccomment">/// Hand was found with this position
+    </span>HandFound {
+        <span class="doccomment">/// The hand position in spherical coordinates
+        </span>hand_pos: CoordsSpherical,
+    },
 }
 
 <span class="doccomment">/// Configurable sensor parameters. Different for every sensor.

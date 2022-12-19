@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["HandState",""]],"struct":[["SensorMeasurement","Represents a sensor measurement coming from the TOF sensor."],["SensorParams","Configurable sensor parameters. Different for every sensor."]]};
+window.SIDEBAR_ITEMS = {"enum":[["HandState","The Hand state."]],"struct":[["SensorMeasurement","Represents a sensor measurement coming from the TOF sensor."],["SensorParams","Configurable sensor parameters. Different for every sensor."]]};

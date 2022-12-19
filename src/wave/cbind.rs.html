@@ -72,6 +72,27 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
 </pre><pre class="rust"><code><span class="doccomment">//! C bindings
 
 </span><span class="kw">use </span><span class="kw">crate</span>::math::{CoordsCartesian, CoordsSpherical};
@@ -80,43 +101,59 @@
     GestureRecognizer, RecognizerParams, RecognizerResult, RecognizerStatus, SensorMeasurement,
 };
 
-<span class="doccomment">/// Overwrite this define to change the x-axis resolution of the sensor.  
+<span class="doccomment">/// The horizontal sensor resolution.
+/// 
+/// For users of C bindings:
+/// Overwrite this define to change the x-axis resolution of the sensor.  
 ///
 /// For VL53L5CX: resolution either 4x4 or 8x8.
 </span><span class="kw">pub const </span>RES_X: usize = <span class="number">8</span>;
-<span class="doccomment">/// Overwrite this define to change the y-axis resolution of the sensor.  
+
+<span class="doccomment">/// The vertical sensor resolution.
 ///
+/// For users of C bindings:
+/// Overwrite this define to change the x-axis resolution of the sensor.  
+/// 
 /// For VL53L5CX: resolution either 4x4 or 8x8.
 </span><span class="kw">pub const </span>RES_Y: usize = <span class="number">8</span>;
 
-<span class="attribute">#[no_mangle]
-</span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>sensor_measurement_empty() -&gt; SensorMeasurement&lt;RES_X, RES_Y&gt; {
+<span class="doccomment">/// Creates a invalid measurement ( distance is set to -1.0 )
+</span><span class="attribute">#[no_mangle]
+</span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>sensor_measurement_invalid() -&gt; SensorMeasurement&lt;RES_X, RES_Y&gt; {
     SensorMeasurement::&lt;RES_X, RES_Y&gt;::invalid()
 }
 
-<span class="attribute">#[no_mangle]
+<span class="doccomment">/// Default sensor parameters for the ST VL53L5CX TOF-Sensor
+</span><span class="attribute">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>sensor_params_default_vl53l5cx() -&gt; SensorParams {
     SensorParams::default_vl53l5cx()
 }
 
-<span class="attribute">#[no_mangle]
+<span class="doccomment">/// Default recognizer parameters, providing a good starting point for gesture recognition
+</span><span class="attribute">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>recognizer_params_default() -&gt; RecognizerParams {
     RecognizerParams::default()
 }
 
-<span class="attribute">#[no_mangle]
+<span class="doccomment">/// Default result, meaning no hand is found and no gestures are recognized. Used to initialize the result before passing
+/// it to the recognizer
+</span><span class="attribute">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>recognizer_result_default() -&gt; RecognizerResult {
     RecognizerResult::default()
 }
 
-<span class="attribute">#[no_mangle]
+<span class="doccomment">/// A new gesture recognizer initialized with default parameters.
+///
+/// The sensor parameters must be provided by the user. There are preconfigured defaults for common TOF-Sensors
+</span><span class="attribute">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>gesture_recognizer_new(
     sensor_params: SensorParams,
 ) -&gt; GestureRecognizer&lt;RES_X, RES_Y&gt; {
     GestureRecognizer::new(sensor_params)
 }
 
-<span class="attribute">#[no_mangle]
+<span class="doccomment">/// Resets the gesture recognizer with the given parameters. Clears the history, ongoing predictions and resets the internal state.
+</span><span class="attribute">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>gesture_recognizer_reset(
     gesture_recognizer: <span class="kw-2">&amp;mut </span>GestureRecognizer&lt;RES_X, RES_Y&gt;,
     params: RecognizerParams,
@@ -126,7 +163,10 @@
     gesture_recognizer.reset(params, sensor_params, now)
 }
 
-<span class="attribute">#[no_mangle]
+<span class="doccomment">/// Updates the gesture recognizer with a new measurement and time.
+///
+/// The time in the measurement must be monotonically increasing (usually coming from a systick timer)
+</span><span class="attribute">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>gesture_recognizer_update(
     gesture_recognizer: <span class="kw-2">&amp;mut </span>GestureRecognizer&lt;RES_X, RES_Y&gt;,
     measurement: SensorMeasurement&lt;RES_X, RES_Y&gt;,
@@ -135,12 +175,14 @@
     gesture_recognizer.update(measurement, gesture_result)
 }
 
-<span class="attribute">#[no_mangle]
+<span class="doccomment">/// Converts cartesian to spherical coordinates
+</span><span class="attribute">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>coords_spherical_from_cartesian(coords_cart: CoordsCartesian) -&gt; CoordsSpherical {
     coords_cart.into()
 }
 
-<span class="attribute">#[no_mangle]
+<span class="doccomment">/// Converts spherical to cartesian coordinates
+</span><span class="attribute">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>coords_cartesian_from_spherical(
     coords_spher: CoordsSpherical,
 ) -&gt; CoordsCartesian {
