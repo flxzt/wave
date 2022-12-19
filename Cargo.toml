@@ -1,0 +1,32 @@
+[package]
+name = "wave"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "wave"
+crate-type = ["staticlib"]
+
+[profile.dev]
+panic = "abort"
+# always optimize for size
+opt-level = "s"
+
+[profile.release]
+panic = "abort"
+opt-level = "s"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+libm = "0.2.5"
+# coca = "0.3.0"
+# arrayvec = { version = "0.7.2", default-features = false }
+
+[build-dependencies]
+# git version has support for const generics
+cbindgen = { git = "https://github.com/eqrion/cbindgen" }
+
+[dev-dependencies]
+approx = "0.5.1"
+pretty_assertions = "1.3.0"
