@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["cbind","C bindings"],["math","helper math functions to prepare measurements, convert coordinates, etc."],["measurements","measurements coming from the sensor"],["recognizer","the main entry point in the library."]]};
+window.SIDEBAR_ITEMS = {"mod":[["cbind","wave C bindings"],["math","helper math functions to prepare measurements, convert coordinates, etc."],["measurements","measurements coming from the sensor"],["recognizer","the main entry point in the library."]]};
