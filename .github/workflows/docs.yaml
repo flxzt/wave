@@ -1,0 +1,46 @@
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+name: Documentation
+
+jobs:
+  deploy-docs:
+    concurrency: deploy-docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Clean docs dir
+        run: rm -rf docs
+        shell: bash
+
+      - name: Clean Rust docs dir
+        run: cargo clean --manifest-path ./Cargo.toml --doc
+
+      - name: Build Rust docs
+        run: cargo doc --manifest-path ./Cargo.toml --all-features --no-deps
+
+      - name: Move Rust docs
+        run: mkdir -p docs && mv target/doc/* docs/.
+        shell: bash
+
+      - name: Configure root page
+        run: echo '<meta http-equiv="refresh" content="0; url=wave">' > docs/index.html
+
+      - name: Deploy docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
