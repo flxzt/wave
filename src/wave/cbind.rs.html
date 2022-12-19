@@ -93,6 +93,7 @@
 <span id="93">93</span>
 <span id="94">94</span>
 <span id="95">95</span>
+<span id="96">96</span>
 </pre><pre class="rust"><code><span class="doccomment">//! wave C bindings
 
 </span><span class="kw">use </span><span class="kw">crate</span>::math::{CoordsCartesian, CoordsSpherical};
@@ -142,14 +143,15 @@
     RecognizerResult::default()
 }
 
-<span class="doccomment">/// A new gesture recognizer initialized with default parameters.
+<span class="doccomment">/// A new gesture recognizer with the given parameters.
 ///
-/// The sensor parameters must be provided by the user. There are preconfigured defaults for common TOF-Sensors
+/// The sensor parameters have preconfigured defaults for common TOF-Sensors such as the ST VL53L5CX
 </span><span class="attribute">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>gesture_recognizer_new(
+    params: RecognizerParams,
     sensor_params: SensorParams,
 ) -&gt; GestureRecognizer&lt;RES_X, RES_Y&gt; {
-    GestureRecognizer::new(sensor_params)
+    GestureRecognizer::new(params, sensor_params)
 }
 
 <span class="doccomment">/// Resets the gesture recognizer with the given parameters. Clears the history, ongoing predictions and resets the internal state.

@@ -472,12 +472,12 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="kw">const </span>RES_X: usize, <span class="kw">const </span>RES_Y: usize&gt; GestureRecognizer&lt;RES_X, RES_Y&gt; {
-    <span class="doccomment">/// A new gesture recognizer initialized with default parameters.
+    <span class="doccomment">/// A new gesture recognizer with the given parameters.
     ///
-    /// The sensor parameters must be provided by the user. There are preconfigured defaults for common TOF-Sensors
-    </span><span class="kw">pub fn </span>new(sensor_params: SensorParams) -&gt; <span class="self">Self </span>{
+    /// The sensor parameters have preconfigured defaults for common TOF-Sensors such as the ST VL53L5CX
+    </span><span class="kw">pub fn </span>new(params: RecognizerParams, sensor_params: SensorParams) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            params: RecognizerParams::default(),
+            params,
             sensor_params,
             start_time: <span class="number">0</span>,
             history: [HistoryEntry::invalid(); HISTORY_SIZE],
