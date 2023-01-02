@@ -19,6 +19,10 @@ pub enum Gesture {
     GestureSwipeRight,
     /// A left swipe
     GestureSwipeLeft,
+    /// A up swipe
+    GestureSwipeUp,
+    /// A down swipe
+    GestureSwipeDown,
 }
 
 /// A gesture prediction result.
@@ -52,8 +56,10 @@ pub struct RecognizerParams {
     pub static_hold_tolerance_dist: f32,
     /// How much the hand can move from and towards the sensor while doing a swipe
     pub swipe_tolerance_dist: f32,
-    /// How much the hand has to move in one distance while doing a horizontal swipe
+    /// How much the hand has to move for detecting a horizontal swipe
     pub horizontal_swipe_travel_dist: f32,
+    /// How much the hand has to move for detecting a vertical swipe
+    pub vertical_swipe_travel_dist: f32,
 }
 
 impl Default for RecognizerParams {
@@ -64,6 +70,7 @@ impl Default for RecognizerParams {
             static_hold_tolerance_dist: 100.0,
             swipe_tolerance_dist: 120.0,
             horizontal_swipe_travel_dist: 80.0,
+            vertical_swipe_travel_dist: 70.0,
         }
     }
 }
@@ -314,6 +321,20 @@ impl<const RES_X: usize, const RES_Y: usize> GestureRecognizer<RES_X, RES_Y> {
                                 < -self.params.horizontal_swipe_travel_dist
                             {
                                 return Gesture::GestureSwipeLeft;
+                            }
+
+                            // Detect up swipe
+                            if hand_pos_newer_cart.z - hand_pos_cart.z
+                                > self.params.vertical_swipe_travel_dist
+                            {
+                                return Gesture::GestureSwipeUp;
+                            }
+
+                            // Detect down swipe
+                            if hand_pos_newer_cart.z - hand_pos_cart.z
+                                < -self.params.vertical_swipe_travel_dist
+                            {
+                                return Gesture::GestureSwipeDown;
                             }
                         }
                     }
