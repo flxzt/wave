@@ -5,6 +5,12 @@
 
 A no-std no-alloc gesture recognition library for low resolution TOF-Sensors
 
+## Demo
+
+[swipes horizontal](https://i.imgur.com/B8p8qTv.mp4)  
+[swipes vertical](https://i.imgur.com/uHabknl.mp4)  
+[static hold](https://i.imgur.com/RYvh7jQ.mp4)  
+
 ## C bindings
 
 The library and bindings can be (re)built with `cargo build --release`.
