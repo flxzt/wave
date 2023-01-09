@@ -1,7 +1,16 @@
 [package]
 name = "wave"
 version = "0.1.0"
+authors = ["flxzt"]
 edition = "2021"
+description = "A no-std no-alloc gesture recognition library for low resolution TOF-Sensors"
+readme = "README.md"
+homepage = "https://github.com/flxzt/wave"
+repository = "https://github.com/flxzt/wave"
+license = "MIT"
+keywords = ["embedded", "sensors", "tof", "gestures"]
+categories = ["embedded", "no-std", "hardware-support"]
+build = "build.rs"
 
 [lib]
 name = "wave"
@@ -20,12 +29,11 @@ opt-level = "s"
 
 [dependencies]
 libm = "0.2.5"
-# coca = "0.3.0"
-# arrayvec = { version = "0.7.2", default-features = false }
 
 [build-dependencies]
 # git version has support for const generics
-cbindgen = { git = "https://github.com/eqrion/cbindgen" }
+# need to wait for a new release (current version: 0.24.3) before the crate can be published on crates-io
+cbindgen = { git = "https://github.com/eqrion/cbindgen", rev = "b6e73017e679caf3b01217e62642d0722a464887" }
 
 [dev-dependencies]
 approx = "0.5.1"
