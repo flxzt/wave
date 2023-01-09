@@ -11,14 +11,11 @@ jobs:
     concurrency: deploy-docs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Cache
         uses: Swatinem/rust-cache@v1
@@ -28,16 +25,10 @@ jobs:
         shell: bash
 
       - name: Clean Rust docs dir
-        uses: actions-rs/cargo@v1
-        with:
-          command: clean
-          args: --manifest-path ./Cargo.toml --doc
+        run: cargo clean --manifest-path ./Cargo.toml --doc
 
       - name: Build Rust docs
-        uses: actions-rs/cargo@v1
-        with:
-          command: doc
-          args: --manifest-path ./Cargo.toml --all-features --no-deps
+        run: cargo doc --manifest-path ./Cargo.toml --all-features --no-deps
 
       - name: Move Rust docs
         run: mkdir -p docs && mv target/doc/* docs/.
