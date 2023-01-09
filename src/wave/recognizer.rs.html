@@ -345,6 +345,11 @@
 <span id="345">345</span>
 <span id="346">346</span>
 <span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
 </pre><pre class="rust"><code><span class="doccomment">//! the main entry point in the library.
 //!
 //! All distance values are considered to be in millimeter
@@ -404,9 +409,9 @@
     <span class="doccomment">/// How much the hand can move from and towards the sensor while doing a swipe
     </span><span class="kw">pub </span>swipe_tolerance_dist: f32,
     <span class="doccomment">/// How much the hand has to move for detecting a horizontal swipe
-    </span><span class="kw">pub </span>horizontal_swipe_travel_dist: f32,
+    </span><span class="kw">pub </span>swipe_horizontal_travel_dist: f32,
     <span class="doccomment">/// How much the hand has to move for detecting a vertical swipe
-    </span><span class="kw">pub </span>vertical_swipe_travel_dist: f32,
+    </span><span class="kw">pub </span>swipe_vertical_travel_dist: f32,
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>RecognizerParams {
@@ -416,8 +421,8 @@
             static_hold_time_ms: <span class="number">1500</span>,
             static_hold_tolerance_dist: <span class="number">100.0</span>,
             swipe_tolerance_dist: <span class="number">120.0</span>,
-            horizontal_swipe_travel_dist: <span class="number">80.0</span>,
-            vertical_swipe_travel_dist: <span class="number">70.0</span>,
+            swipe_horizontal_travel_dist: <span class="number">80.0</span>,
+            swipe_vertical_travel_dist: <span class="number">70.0</span>,
         }
     }
 }
@@ -569,13 +574,14 @@
         <span class="self">self</span>.params
     }
 
-    <span class="kw">fn </span>push_to_history(<span class="kw-2">&amp;mut </span><span class="self">self</span>, entry: HistoryEntry&lt;RES_X, RES_Y&gt;) {
+    <span class="doccomment">/// Pushes an entry to the history
+    </span><span class="kw">fn </span>push_to_history(<span class="kw-2">&amp;mut </span><span class="self">self</span>, entry: HistoryEntry&lt;RES_X, RES_Y&gt;) {
         <span class="self">self</span>.history.rotate_right(<span class="number">1</span>);
         <span class="self">self</span>.history[<span class="number">0</span>] = entry;
         <span class="self">self</span>.received_measurements += <span class="number">1</span>;
     }
 
-    <span class="doccomment">/// Clears the history and fills it with invalid measurements and state (all dist values = -1.0)
+    <span class="doccomment">/// Clears the history and fills it with invalid measurements and state (all dist values set to -1.0)
     </span><span class="kw">fn </span>clear_history(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">for </span>entry <span class="kw">in </span><span class="self">self</span>.history.iter_mut() {
             <span class="kw-2">*</span>entry = HistoryEntry::invalid();
@@ -584,7 +590,8 @@
         <span class="self">self</span>.received_measurements = <span class="number">0</span>;
     }
 
-    <span class="kw">fn </span>recognize_gesture(<span class="kw-2">&amp;mut </span><span class="self">self</span>, now: u32) -&gt; Gesture {
+    <span class="doccomment">/// Attempts to recognize a gesture from the measurements
+    </span><span class="kw">fn </span>recognize_gesture(<span class="kw-2">&amp;mut </span><span class="self">self</span>, now: u32) -&gt; Gesture {
         <span class="kw">let </span><span class="kw-2">mut </span>gesture = Gesture::GestureNone;
 
         <span class="kw">if </span><span class="self">self</span>.find_static_hold(now) {
@@ -605,7 +612,10 @@
         gesture
     }
 
-    <span class="kw">fn </span>find_static_hold(<span class="kw-2">&amp;</span><span class="self">self</span>, now: u32) -&gt; bool {
+    <span class="doccomment">/// Tries to recognize a static hold.
+    ///
+    /// Returns true when recognized, else false
+    </span><span class="kw">fn </span>find_static_hold(<span class="kw-2">&amp;</span><span class="self">self</span>, now: u32) -&gt; bool {
         <span class="kw">if </span><span class="self">self</span>.received_measurements &lt; HISTORY_SIZE.min(<span class="number">15</span>) {
             <span class="kw">return </span><span class="bool-val">false</span>;
         }
@@ -658,28 +668,28 @@
                         {
                             <span class="comment">// Detect right swipe
                             </span><span class="kw">if </span>hand_pos_newer_cart.y - hand_pos_cart.y
-                                &gt; <span class="self">self</span>.params.horizontal_swipe_travel_dist
+                                &gt; <span class="self">self</span>.params.swipe_horizontal_travel_dist
                             {
                                 <span class="kw">return </span>Gesture::GestureSwipeRight;
                             }
 
                             <span class="comment">// Detect left swipe
                             </span><span class="kw">if </span>hand_pos_newer_cart.y - hand_pos_cart.y
-                                &lt; -<span class="self">self</span>.params.horizontal_swipe_travel_dist
+                                &lt; -<span class="self">self</span>.params.swipe_horizontal_travel_dist
                             {
                                 <span class="kw">return </span>Gesture::GestureSwipeLeft;
                             }
 
                             <span class="comment">// Detect up swipe
                             </span><span class="kw">if </span>hand_pos_newer_cart.z - hand_pos_cart.z
-                                &gt; <span class="self">self</span>.params.vertical_swipe_travel_dist
+                                &gt; <span class="self">self</span>.params.swipe_vertical_travel_dist
                             {
                                 <span class="kw">return </span>Gesture::GestureSwipeUp;
                             }
 
                             <span class="comment">// Detect down swipe
                             </span><span class="kw">if </span>hand_pos_newer_cart.z - hand_pos_cart.z
-                                &lt; -<span class="self">self</span>.params.vertical_swipe_travel_dist
+                                &lt; -<span class="self">self</span>.params.swipe_vertical_travel_dist
                             {
                                 <span class="kw">return </span>Gesture::GestureSwipeDown;
                             }

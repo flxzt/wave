@@ -310,18 +310,13 @@
 <span id="310">310</span>
 <span id="311">311</span>
 <span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
 </pre><pre class="rust"><code><span class="doccomment">//! measurements coming from the sensor
 
 </span><span class="kw">use </span>core::f32::consts::FRAC_PI_2;
 
 <span class="kw">use </span><span class="kw">crate</span>::math::{CoordsCartesian, CoordsSpherical};
 
-<span class="doccomment">/// The Hand state.
-///
-/// When found, contains the hand position in spherical coordinates
+<span class="doccomment">/// The recognized hand state.
 </span><span class="attribute">#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 </span><span class="kw">pub enum </span>HandState {
@@ -358,7 +353,7 @@
 <span class="doccomment">/// Represents a sensor measurement coming from the TOF sensor.
 ///
 /// Expects that the zones are already rotated and mirrored,
-/// so that the zone with index [0][0] is the top left corner when looking at the sensor ( with indexing zone_dist[&quot;y dir&quot;][&quot;x dir&quot;] )
+/// so that the zone with index [0][0] is the top left corner when looking at the sensor
 </span><span class="attribute">#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 </span><span class="kw">pub struct </span>SensorMeasurement&lt;<span class="kw">const </span>RES_X: usize, <span class="kw">const </span>RES_Y: usize&gt; {
@@ -366,7 +361,7 @@
     ///
     /// invalid distance measurements are represented by value -1.0
     </span><span class="kw">pub </span>zone_dist: [[f32; RES_X]; RES_Y],
-    <span class="doccomment">/// The time in ms of the measurement. Must be monotonically increasing.
+    <span class="doccomment">/// The time of the measurement in milliseconds. Must be monotonically increasing.
     </span><span class="kw">pub </span>time_ms: u32,
 }
 
@@ -379,7 +374,7 @@
         }
     }
 
-    <span class="doccomment">/// An invalid measurement, meaning all values are set to either 0 or invalid (-1.0 for distances)
+    <span class="doccomment">/// An invalid measurement. The time is set to zero, distances are set to invalid ( value -1.0)
     </span><span class="kw">pub fn </span>invalid() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             zone_dist: [[-<span class="number">1.0</span>; RES_X]; RES_Y],
@@ -387,7 +382,7 @@
         }
     }
 
-    <span class="doccomment">/// finds the position in the matrix and distance value of the zone with minimal distance
+    <span class="doccomment">/// Finds the position in the matrix and distance value of the zone with minimal distance
     ///
     /// Returns the tuple: ([&quot;x-pos in matrix&quot;, &quot;y-pos in matrix&quot;], &quot;distance&quot;)
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>min_dist(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ([usize; <span class="number">2</span>], f32) {
@@ -412,7 +407,7 @@
             })
     }
 
-    <span class="doccomment">/// finds the minimal distance of each column.
+    <span class="doccomment">/// Finds the minimal distance of each column.
     </span><span class="attribute">#[allow(dead_code)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>min_dist_cols(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [f32; RES_X] {
         <span class="kw">let </span><span class="kw-2">mut </span>columns = [f32::MAX; RES_X];
@@ -438,7 +433,7 @@
         }
     }
 
-    <span class="doccomment">/// attempts to find the hand position. Expects that there is at least one valid distance value in one of the zones,
+    <span class="doccomment">/// Attempts to find the hand position. Expects that there is at least one valid distance value in one of the zones,
     /// else returns invalid spherical coordinates
     </span><span class="kw">fn </span>hand_pos(<span class="kw-2">&amp;</span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>SensorParams) -&gt; CoordsSpherical {
         <span class="comment">// First calculate the positions of the zone measurements
@@ -459,10 +454,9 @@
         // calculates the weight of the positions in regards to min_pos for the weighted average mean
         </span><span class="kw">fn </span>pos_weight(min_pos: <span class="kw-2">&amp;</span>CoordsCartesian, other: <span class="kw-2">&amp;</span>CoordsCartesian) -&gt; f32 {
             <span class="doccomment">/// This is the factor that determines how much the distance weighs in into the average mean.
-            /// Since the distances are in mm, one should also use it weigh in the dist as cm
             ///
-            /// e.g. a factor of 10.0 means that a position 1cm away from the measurement with min dist weighs in with 10.0,
-            /// ,a position 2cm away weighs in with 5.0.
+            /// E.g. a factor of 10.0 means that a position 1cm away from the measurement with min dist weighs in with 10.0,
+            /// a position 2cm away weighs in with 5.0.
             </span><span class="kw">const </span>WEIGHT_FACTOR: f32 = <span class="number">100.0</span>;
 
             <span class="kw">let </span>dist_to = min_pos.dist_to(other);
@@ -547,12 +541,12 @@
     </span>}
 }
 
-<span class="doccomment">/// calculates the position in space for the measurement in a sensor zone.
+<span class="doccomment">/// Calculates the position in space for the measurement in a sensor zone.
 /// dist: the distance value of the measurement
 /// zone_pos_x: The x-index of the zone in the sensor grid
 /// zone_pos_y: The y-index of the zone in the sensor grid
 ///
-/// Returns the position in shperical coordinates
+/// Returns the position in spherical coordinates
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dist_position_spher&lt;<span class="kw">const </span>RES_X: usize, <span class="kw">const </span>RES_Y: usize&gt;(
     dist: f32,
     zone_pos_x: usize,
@@ -575,7 +569,7 @@
     CoordsSpherical { r, theta, phi }
 }
 
-<span class="doccomment">/// finds the nearest zone for all given measurements.
+<span class="doccomment">/// Finds the nearest zone for all given measurements.
 ///
 /// Returns the tuple: (&quot;index of the measurement containing the nearest zone&quot;, [&quot;x-pos in matrix&quot;, &quot;y-pos in matrix&quot;], &quot;distance&quot;)
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>find_nearest_zone&lt;
@@ -599,7 +593,7 @@
         })
 }
 
-<span class="doccomment">/// finds the nearest hand position for all given hand states.
+<span class="doccomment">/// Finds the nearest hand position for all given hand states.
 /// If the iterator contains no valid hand state, it returns index 0 and invalid spherical coordinates
 ///
 /// Returns the tuple: (&quot;index of the hand state containing the nearest pos&quot;, &quot;hand pos&quot;)

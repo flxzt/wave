@@ -327,9 +327,9 @@
 </span><span class="kw">pub struct </span>CoordsCartesian {
     <span class="doccomment">/// The distance to the origin on the x-axis
     </span><span class="kw">pub </span>x: f32,
-    <span class="doccomment">/// The distance to the origin on the z-axis
-    </span><span class="kw">pub </span>y: f32,
     <span class="doccomment">/// The distance to the origin on the y-axis
+    </span><span class="kw">pub </span>y: f32,
+    <span class="doccomment">/// The distance to the origin on the z-axis
     </span><span class="kw">pub </span>z: f32,
 }
 
@@ -353,7 +353,7 @@
         }
     }
 
-    <span class="doccomment">/// Calculates the eucledian distance to other coordinates
+    <span class="doccomment">/// Calculates the euclidean distance to other
     </span><span class="kw">pub fn </span>dist_to(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; f32 {
         libm::sqrtf(
             libm::powf(<span class="self">self</span>.x - other.x, <span class="number">2.0</span>)
@@ -371,7 +371,7 @@
     </span><span class="kw">pub </span>r: f32,
     <span class="doccomment">/// angle with respect to x-axis (azimuth) (rad)
     </span><span class="kw">pub </span>theta: f32,
-    <span class="doccomment">/// angle with respect to polar axis / z-axis (zenith) (rad)
+    <span class="doccomment">/// angle with respect to polar / z-axis (zenith) (rad)
     </span><span class="kw">pub </span>phi: f32,
 }
 
@@ -388,7 +388,7 @@
 }
 
 <span class="kw">impl </span>CoordsSpherical {
-    <span class="doccomment">/// Returns invalid coorindates ( r is set to -1.0 )
+    <span class="doccomment">/// Returns invalid coordinates ( r is set to -1.0 )
     </span><span class="kw">pub fn </span>invalid() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             r: -<span class="number">1.0</span>,
@@ -397,12 +397,12 @@
         }
     }
 
-    <span class="doccomment">/// Checks if the coorindate is invalid ( r is -1.0 )
+    <span class="doccomment">/// Checks if the coorindate is invalid ( r is &lt; 0.0 )
     </span><span class="kw">pub fn </span>is_invalid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.r &lt; <span class="number">0.0
     </span>}
 
-    <span class="doccomment">/// Returns the origin coordinates (r, theta and phi are set to 0.0 )
+    <span class="doccomment">/// Origin coordinates (r, theta and phi are set to 0.0 )
     </span><span class="kw">pub fn </span>zero() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             r: <span class="number">0.0</span>,
