@@ -6,9 +6,9 @@
 pub struct CoordsCartesian {
     /// The distance to the origin on the x-axis
     pub x: f32,
-    /// The distance to the origin on the z-axis
-    pub y: f32,
     /// The distance to the origin on the y-axis
+    pub y: f32,
+    /// The distance to the origin on the z-axis
     pub z: f32,
 }
 
@@ -32,7 +32,7 @@ impl CoordsCartesian {
         }
     }
 
-    /// Calculates the eucledian distance to other coordinates
+    /// Calculates the euclidean distance to other
     pub fn dist_to(&self, other: &Self) -> f32 {
         libm::sqrtf(
             libm::powf(self.x - other.x, 2.0)
@@ -42,7 +42,7 @@ impl CoordsCartesian {
     }
 }
 
-/// Represents spherical coordinates in mathematical naming convention (https://mathworld.wolfram.com/SphericalCoordinates.html)
+/// Represents spherical coordinates in mathematical naming convention. ( [Reference](https://mathworld.wolfram.com/SphericalCoordinates.html) )
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct CoordsSpherical {
@@ -50,7 +50,7 @@ pub struct CoordsSpherical {
     pub r: f32,
     /// angle with respect to x-axis (azimuth) (rad)
     pub theta: f32,
-    /// angle with respect to polar axis / z-axis (zenith) (rad)
+    /// angle with respect to polar / z-axis (zenith) (rad)
     pub phi: f32,
 }
 
@@ -67,7 +67,7 @@ impl From<CoordsCartesian> for CoordsSpherical {
 }
 
 impl CoordsSpherical {
-    /// Returns invalid coorindates ( r is set to -1.0 )
+    /// Returns invalid coordinates ( r is set to -1.0 )
     pub fn invalid() -> Self {
         Self {
             r: -1.0,
@@ -76,12 +76,12 @@ impl CoordsSpherical {
         }
     }
 
-    /// Checks if the coorindate is invalid ( r is -1.0 )
+    /// Checks if the coorindate is invalid ( r is < 0.0 )
     pub fn is_invalid(&self) -> bool {
         self.r < 0.0
     }
 
-    /// Returns the origin coordinates (r, theta and phi are set to 0.0 )
+    /// Origin coordinates (r, theta and phi are set to 0.0 )
     pub fn zero() -> Self {
         Self {
             r: 0.0,

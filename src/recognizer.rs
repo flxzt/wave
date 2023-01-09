@@ -57,9 +57,9 @@ pub struct RecognizerParams {
     /// How much the hand can move from and towards the sensor while doing a swipe
     pub swipe_tolerance_dist: f32,
     /// How much the hand has to move for detecting a horizontal swipe
-    pub horizontal_swipe_travel_dist: f32,
+    pub swipe_horizontal_travel_dist: f32,
     /// How much the hand has to move for detecting a vertical swipe
-    pub vertical_swipe_travel_dist: f32,
+    pub swipe_vertical_travel_dist: f32,
 }
 
 impl Default for RecognizerParams {
@@ -69,8 +69,8 @@ impl Default for RecognizerParams {
             static_hold_time_ms: 1500,
             static_hold_tolerance_dist: 100.0,
             swipe_tolerance_dist: 120.0,
-            horizontal_swipe_travel_dist: 80.0,
-            vertical_swipe_travel_dist: 70.0,
+            swipe_horizontal_travel_dist: 80.0,
+            swipe_vertical_travel_dist: 70.0,
         }
     }
 }
@@ -222,13 +222,14 @@ impl<const RES_X: usize, const RES_Y: usize> GestureRecognizer<RES_X, RES_Y> {
         self.params
     }
 
+    /// Pushes an entry to the history
     fn push_to_history(&mut self, entry: HistoryEntry<RES_X, RES_Y>) {
         self.history.rotate_right(1);
         self.history[0] = entry;
         self.received_measurements += 1;
     }
 
-    /// Clears the history and fills it with invalid measurements and state (all dist values = -1.0)
+    /// Clears the history and fills it with invalid measurements and state (all dist values set to -1.0)
     fn clear_history(&mut self) {
         for entry in self.history.iter_mut() {
             *entry = HistoryEntry::invalid();
@@ -237,6 +238,7 @@ impl<const RES_X: usize, const RES_Y: usize> GestureRecognizer<RES_X, RES_Y> {
         self.received_measurements = 0;
     }
 
+    /// Attempts to recognize a gesture from the measurements
     fn recognize_gesture(&mut self, now: u32) -> Gesture {
         let mut gesture = Gesture::GestureNone;
 
@@ -258,6 +260,9 @@ impl<const RES_X: usize, const RES_Y: usize> GestureRecognizer<RES_X, RES_Y> {
         gesture
     }
 
+    /// Tries to recognize a static hold.
+    ///
+    /// Returns true when recognized, else false
     fn find_static_hold(&self, now: u32) -> bool {
         if self.received_measurements < HISTORY_SIZE.min(15) {
             return false;
@@ -311,28 +316,28 @@ impl<const RES_X: usize, const RES_Y: usize> GestureRecognizer<RES_X, RES_Y> {
                         {
                             // Detect right swipe
                             if hand_pos_newer_cart.y - hand_pos_cart.y
-                                > self.params.horizontal_swipe_travel_dist
+                                > self.params.swipe_horizontal_travel_dist
                             {
                                 return Gesture::GestureSwipeRight;
                             }
 
                             // Detect left swipe
                             if hand_pos_newer_cart.y - hand_pos_cart.y
-                                < -self.params.horizontal_swipe_travel_dist
+                                < -self.params.swipe_horizontal_travel_dist
                             {
                                 return Gesture::GestureSwipeLeft;
                             }
 
                             // Detect up swipe
                             if hand_pos_newer_cart.z - hand_pos_cart.z
-                                > self.params.vertical_swipe_travel_dist
+                                > self.params.swipe_vertical_travel_dist
                             {
                                 return Gesture::GestureSwipeUp;
                             }
 
                             // Detect down swipe
                             if hand_pos_newer_cart.z - hand_pos_cart.z
-                                < -self.params.vertical_swipe_travel_dist
+                                < -self.params.swipe_vertical_travel_dist
                             {
                                 return Gesture::GestureSwipeDown;
                             }

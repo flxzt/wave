@@ -22,7 +22,7 @@ pub const RES_X: usize = 8;
 /// For VL53L5CX: resolution either 4x4 or 8x8.
 pub const RES_Y: usize = 8;
 
-/// Creates a invalid measurement ( distance is set to -1.0 )
+/// Creates an invalid measurement ( distances are set to -1.0 )
 #[no_mangle]
 pub extern "C" fn sensor_measurement_invalid() -> SensorMeasurement<RES_X, RES_Y> {
     SensorMeasurement::<RES_X, RES_Y>::invalid()

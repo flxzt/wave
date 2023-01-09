@@ -13,7 +13,7 @@ pub mod math;
 pub mod measurements;
 pub mod recognizer;
 
-// Re-Exports
+// Re-exports
 pub use measurements::HandState;
 pub use measurements::SensorMeasurement;
 pub use recognizer::Gesture;
