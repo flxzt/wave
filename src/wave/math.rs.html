@@ -319,6 +319,7 @@
 <span id="319">319</span>
 <span id="320">320</span>
 <span id="321">321</span>
+<span id="322">322</span>
 </pre><pre class="rust"><code><span class="doccomment">//! helper math functions to prepare measurements, convert coordinates, etc.
 
 /// Cartesian coordinates
@@ -363,7 +364,8 @@
     }
 }
 
-<span class="doccomment">/// Represents spherical coordinates in mathematical naming convention (https://mathworld.wolfram.com/SphericalCoordinates.html)
+<span class="doccomment">/// Represents spherical coordinates in mathematical naming convention. Reference:
+/// (https://mathworld.wolfram.com/SphericalCoordinates.html)[https://mathworld.wolfram.com/SphericalCoordinates.html]
 </span><span class="attribute">#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 </span><span class="kw">pub struct </span>CoordsSpherical {
