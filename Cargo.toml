@@ -1,6 +1,6 @@
 [package]
 name = "wave"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["flxzt"]
 edition = "2021"
 description = "A no-std no-alloc gesture recognition library for low resolution TOF-Sensors"
@@ -16,7 +16,7 @@ exclude = [
 
 [lib]
 name = "wave"
-crate-type = ["staticlib"]
+crate-type = ["lib", "staticlib"]
 
 [profile.dev]
 panic = "abort"
@@ -33,7 +33,6 @@ opt-level = "s"
 libm = "0.2.5"
 
 [build-dependencies]
-cbindgen = "0.24.3"
 
 [dev-dependencies]
 approx = "0.5.1"

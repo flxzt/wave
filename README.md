@@ -27,7 +27,7 @@ https://user-images.githubusercontent.com/19841886/212337254-f4f6aff8-0575-4d94-
 The static library can be (re)built with `cargo build --release`. Then `libwave.a` will be located in `target/release`.
 The header file `wave.h` is located in the crate root.
 
-Build for a specific architecture, e.g. Cortex-M: `cargo build --release --target=thumbv7em-none-eabi`
+Cross-compile for a specific architecture, e.g. Cortex-M4: `cargo build --release --target=thumbv7em-none-eabi`
 
 Cbindgen is used to (re)generate the header file `wave.h`.
 
