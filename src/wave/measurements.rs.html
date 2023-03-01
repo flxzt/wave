@@ -310,7 +310,7 @@
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
-</pre><pre class="rust"><code><span class="doccomment">//! measurements coming from the sensor
+</pre><pre class="rust"><code><span class="doccomment">//! Sensor Measurements
 
 </span><span class="kw">use </span>core::f32::consts::FRAC_PI_2;
 
@@ -357,9 +357,9 @@
 </span><span class="attr">#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 </span><span class="kw">pub struct </span>SensorMeasurement&lt;<span class="kw">const </span>RES_X: usize, <span class="kw">const </span>RES_Y: usize&gt; {
-    <span class="doccomment">/// the measured distances of each zone.
+    <span class="doccomment">/// The measured distances of each zone.
     ///
-    /// invalid distance measurements are represented by value -1.0
+    /// Invalid distance measurements are represented by value -1.0
     </span><span class="kw">pub </span>zone_dist: [[f32; RES_X]; RES_Y],
     <span class="doccomment">/// The time of the measurement in milliseconds. Must be monotonically increasing.
     </span><span class="kw">pub </span>time_ms: u32,
@@ -434,7 +434,7 @@
     }
 
     <span class="doccomment">/// Attempts to find the hand position. Expects that there is at least one valid distance value in one of the zones,
-    /// else returns invalid spherical coordinates
+    /// else returns invalid spherical coordinates.
     </span><span class="kw">fn </span>hand_pos(<span class="kw-2">&amp;</span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>SensorParams) -&gt; CoordsSpherical {
         <span class="comment">// First calculate the positions of the zone measurements
         </span><span class="kw">let </span><span class="kw-2">mut </span>zones_pos = [[CoordsSpherical::invalid(); RES_X]; RES_Y];

@@ -99,7 +99,7 @@
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
-</pre><pre class="rust"><code><span class="doccomment">//! wave C bindings
+</pre><pre class="rust"><code><span class="doccomment">//! C Bindings
 
 </span><span class="kw">use </span><span class="kw">crate</span>::math::{CoordsCartesian, CoordsSpherical};
 <span class="kw">use </span><span class="kw">crate</span>::measurements::SensorParams;
@@ -110,22 +110,22 @@
 <span class="doccomment">/// The horizontal sensor resolution.
 ///
 /// For users of the C bindings:
-/// Overwrite this define to change the x-axis resolution of the sensor.  
+/// Change the value of this definition to change the x-axis resolution of the sensor.
 ///
-/// For VL53L5CX: resolution either 4x4 or 8x8.
+/// For VL53L5CX: Resolution either 4x4 or 8x8.
 </span><span class="kw">pub const </span>RES_X: usize = <span class="number">8</span>;
 
 <span class="doccomment">/// The vertical sensor resolution.
 ///
 /// For users of the C bindings:
-/// Overwrite this define to change the x-axis resolution of the sensor.  
+/// Change the value of this definition to change the y-axis resolution of the sensor.
 ///
-/// For VL53L5CX: resolution either 4x4 or 8x8.
+/// For VL53L5CX: Resolution either 4x4 or 8x8.
 </span><span class="kw">pub const </span>RES_Y: usize = <span class="number">8</span>;
 
 <span class="doccomment">/// The history size.
 ///
-/// Must be large enough to hold at least ca 2secs of data to be able to reliably recognize gestures.
+/// Must be large enough to hold at least ca 2 seconds of data to be able to reliably recognize gestures.
 </span><span class="kw">pub const </span>HISTORY_SIZE: usize = <span class="number">60</span>;
 
 <span class="doccomment">/// Creates an invalid measurement ( distances are set to -1.0 )

@@ -27,16 +27,18 @@
 <a href="#27" id="27">27</a>
 <a href="#28" id="28">28</a>
 <a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
 </pre><pre class="rust"><code><span class="attr">#![warn(missing_debug_implementations)]
 #![warn(missing_docs)]
 
 </span><span class="doccomment">//! wave
 //!
-//! A no-std no-alloc gesture recognition library for low resolution TOF-Sensors
+//! A no-std no-alloc gesture recognition library for low resolution TOF-Sensors.
 
 </span><span class="comment">// Only enable std for tests
 </span><span class="attr">#![cfg_attr(not(test), no_std)]
 
+</span><span class="comment">// Modules
 </span><span class="kw">pub mod </span>cbind;
 <span class="kw">pub mod </span>math;
 <span class="kw">pub mod </span>measurements;

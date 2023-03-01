@@ -343,9 +343,13 @@
 <a href="#343" id="343">343</a>
 <a href="#344" id="344">344</a>
 <a href="#345" id="345">345</a>
-</pre><pre class="rust"><code><span class="doccomment">//! the main entry point in the library.
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+</pre><pre class="rust"><code><span class="doccomment">//! Gesture Recognizer
 //!
-//! All distance values are considered to be in millimeter
+//! All distance values are considered to be in millimeter.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::math::CoordsCartesian;
 <span class="kw">use </span><span class="kw">crate</span>::measurements::SensorParams;
@@ -358,7 +362,7 @@
 </span><span class="kw">pub enum </span>Gesture {
     <span class="doccomment">/// No recognized gesture
     </span>GestureNone = <span class="number">0</span>,
-    <span class="doccomment">/// A static hold, meaning the hand is hovering still for a period of time
+    <span class="doccomment">/// A static hold
     </span>GestureStaticHold,
     <span class="doccomment">/// A right swipe
     </span>GestureSwipeRight,
@@ -370,13 +374,13 @@
     </span>GestureSwipeDown,
 }
 
-<span class="doccomment">/// A gesture prediction result.
+<span class="doccomment">/// A gesture prediction result
 </span><span class="attr">#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 </span><span class="kw">pub struct </span>RecognizerResult {
     <span class="doccomment">/// The current hand state
     </span><span class="kw">pub </span>hand_state: HandState,
-    <span class="doccomment">/// The recognized gesture, GestureNone if no gesture was found.
+    <span class="doccomment">/// The recognized gesture, GestureNone if no gesture was recognized
     </span><span class="kw">pub </span>gesture: Gesture,
 }
 
@@ -397,13 +401,13 @@
     </span><span class="kw">pub </span>gesture_threshold_dist: f32,
     <span class="doccomment">/// The time the hand has to be still to recognize a static hold
     </span><span class="kw">pub </span>static_hold_time_ms: u32,
-    <span class="doccomment">/// How much the hand can move from and towards the sensor while doing a static hold
+    <span class="doccomment">/// How much the hand can move towards / away from the sensor while doing a static hold
     </span><span class="kw">pub </span>static_hold_tolerance_dist: f32,
-    <span class="doccomment">/// How much the hand can move from and towards the sensor while doing a swipe
+    <span class="doccomment">/// How much the hand can move towards / away from the sensor while doing a swipe
     </span><span class="kw">pub </span>swipe_tolerance_dist: f32,
-    <span class="doccomment">/// How much the hand has to move for detecting a horizontal swipe
+    <span class="doccomment">/// How much distance the hand has to travel to detect a horizontal swipe
     </span><span class="kw">pub </span>swipe_horizontal_travel_dist: f32,
-    <span class="doccomment">/// How much the hand has to move for detecting a vertical swipe
+    <span class="doccomment">/// How much distance the hand has to travel to detect a vertical swipe
     </span><span class="kw">pub </span>swipe_vertical_travel_dist: f32,
 }
 
@@ -427,7 +431,7 @@
 </span><span class="kw">pub enum </span>RecognizerStatus {
     <span class="doccomment">/// Ok
     </span>RecognizerStatusOk = <span class="number">0</span>,
-    <span class="doccomment">/// Indicates a failure to initialize the recognizer
+    <span class="doccomment">/// Indicates a failure while the recognizer was initialized
     </span>RecognizerStatusInitFailure,
     <span class="doccomment">/// Indicates invalid input to the recognizer
     </span>RecognizerStatusInvalidInput,
@@ -477,7 +481,9 @@
         .filter(<span class="kw">move </span>|e| now - e.measurement.time_ms &gt;= older_eq_ms)
 }
 
-<span class="doccomment">/// The gesture recognizer. Is initially configured through parameters and gets fed measurements and time and predicts gestures based on its input.
+<span class="doccomment">/// The gesture recognizer.
+///
+/// Is initially configured through parameters and gets fed measurements and time and predicts gestures.
 </span><span class="attr">#[repr(C)]
 #[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>GestureRecognizer&lt;<span class="kw">const </span>RES_X: usize, <span class="kw">const </span>RES_Y: usize, <span class="kw">const </span>HISTORY_SIZE: usize&gt; {
@@ -493,7 +499,7 @@
 {
     <span class="doccomment">/// A new gesture recognizer with the given parameters.
     ///
-    /// The sensor parameters have preconfigured defaults for common TOF-Sensors such as the ST VL53L5CX
+    /// The sensor parameters have preconfigured defaults for common TOF-Sensors such as the ST VL53L5CX.
     </span><span class="kw">pub fn </span>new(params: RecognizerParams, sensor_params: SensorParams) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             params,
@@ -504,7 +510,9 @@
         }
     }
 
-    <span class="doccomment">/// Resets the gesture recognizer with the given parameters. Clears the history, ongoing predictions and resets the internal state.
+    <span class="doccomment">/// Resets the gesture recognizer with the given parameters.
+    ///
+    /// Clears the history, ongoing predictions and resets the internal state.
     </span><span class="kw">pub fn </span>reset(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         params: RecognizerParams,
@@ -521,7 +529,7 @@
 
     <span class="doccomment">/// Updates the gesture recognizer with a new measurement and time.
     ///
-    /// The time in the measurement must be monotonically increasing (usually coming from a systick timer)
+    /// The time in the measurement must be monotonically increasing (usually coming from a systick timer).
     </span><span class="kw">pub fn </span>update(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         measurement: SensorMeasurement&lt;RES_X, RES_Y&gt;,
@@ -598,9 +606,9 @@
         gesture
     }
 
-    <span class="doccomment">/// Tries to recognize a static hold.
+    <span class="doccomment">/// Attempts to recognize a static hold.
     ///
-    /// Returns true when recognized, else false
+    /// Returns true when a hold is recognized, else false.
     </span><span class="kw">fn </span>find_static_hold(<span class="kw-2">&amp;</span><span class="self">self</span>, now: u32) -&gt; bool {
         <span class="kw">if </span><span class="self">self</span>.received_measurements &lt; HISTORY_SIZE.min(<span class="number">15</span>) {
             <span class="kw">return </span><span class="bool-val">false</span>;
@@ -630,7 +638,7 @@
 
     <span class="doccomment">/// Tries to recognize a swipe gesture.
     ///
-    /// Returns either GestureNone if no swipe is found or GestureSwipeRight / GestureSwipeLeft
+    /// Returns either GestureSwipeRight / GestureSwipeLeft or GestureNone if no swipe was found.
     </span><span class="kw">fn </span>find_swipe(<span class="kw-2">&amp;</span><span class="self">self</span>, now: u32) -&gt; Gesture {
         <span class="kw">if </span><span class="self">self</span>.received_measurements &lt; HISTORY_SIZE.min(<span class="number">15</span>) {
             <span class="kw">return </span>Gesture::GestureNone;

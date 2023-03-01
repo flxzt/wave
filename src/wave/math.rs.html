@@ -319,7 +319,7 @@
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
 <a href="#321" id="321">321</a>
-</pre><pre class="rust"><code><span class="doccomment">//! helper math functions to prepare measurements, convert coordinates, etc.
+</pre><pre class="rust"><code><span class="doccomment">//! Math Utilities
 
 /// Cartesian coordinates
 </span><span class="attr">#[repr(C)]
@@ -367,11 +367,11 @@
 </span><span class="attr">#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 </span><span class="kw">pub struct </span>CoordsSpherical {
-    <span class="doccomment">/// distance to the origin
+    <span class="doccomment">/// Distance to the origin
     </span><span class="kw">pub </span>r: f32,
-    <span class="doccomment">/// angle with respect to x-axis (azimuth) (rad)
+    <span class="doccomment">/// Angle with respect to x-axis (azimuth) (rad)
     </span><span class="kw">pub </span>theta: f32,
-    <span class="doccomment">/// angle with respect to polar / z-axis (zenith) (rad)
+    <span class="doccomment">/// Angle with respect to polar / z-axis (zenith) (rad)
     </span><span class="kw">pub </span>phi: f32,
 }
 
