@@ -343,13 +343,6 @@
 <a href="#343" id="343">343</a>
 <a href="#344" id="344">344</a>
 <a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
 </pre><pre class="rust"><code><span class="doccomment">//! the main entry point in the library.
 //!
 //! All distance values are considered to be in millimeter
@@ -484,27 +477,20 @@
         .filter(<span class="kw">move </span>|e| now - e.measurement.time_ms &gt;= older_eq_ms)
 }
 
-<span class="doccomment">/// The history size.
-///
-/// For users of the C bindings: do not modify!
-/// This is not meant to be part of the public API, but needs to be exposed to make the bindings work.  
-/// Is at least ca. large enough to hold ca 2secs of data to be able to reliably recognize gestures.
-</span><span class="kw">pub const </span>HISTORY_SIZE: usize = <span class="number">60</span>;
-
 <span class="doccomment">/// The gesture recognizer. Is initially configured through parameters and gets fed measurements and time and predicts gestures based on its input.
 </span><span class="attr">#[repr(C)]
 #[derive(Debug, Clone)]
-</span><span class="kw">pub struct </span>GestureRecognizer&lt;<span class="kw">const </span>RES_X: usize, <span class="kw">const </span>RES_Y: usize&gt; {
+</span><span class="kw">pub struct </span>GestureRecognizer&lt;<span class="kw">const </span>RES_X: usize, <span class="kw">const </span>RES_Y: usize, <span class="kw">const </span>HISTORY_SIZE: usize&gt; {
     params: RecognizerParams,
     sensor_params: SensorParams,
-
-    <span class="comment">// Internal state
-    </span>start_time: u32,
+    start_time: u32,
     history: [HistoryEntry&lt;RES_X, RES_Y&gt;; HISTORY_SIZE],
     received_measurements: usize,
 }
 
-<span class="kw">impl</span>&lt;<span class="kw">const </span>RES_X: usize, <span class="kw">const </span>RES_Y: usize&gt; GestureRecognizer&lt;RES_X, RES_Y&gt; {
+<span class="kw">impl</span>&lt;<span class="kw">const </span>RES_X: usize, <span class="kw">const </span>RES_Y: usize, <span class="kw">const </span>HISTORY_SIZE: usize&gt;
+    GestureRecognizer&lt;RES_X, RES_Y, HISTORY_SIZE&gt;
+{
     <span class="doccomment">/// A new gesture recognizer with the given parameters.
     ///
     /// The sensor parameters have preconfigured defaults for common TOF-Sensors such as the ST VL53L5CX

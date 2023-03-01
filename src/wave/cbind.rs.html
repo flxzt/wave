@@ -94,6 +94,12 @@
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
 </pre><pre class="rust"><code><span class="doccomment">//! wave C bindings
 
 </span><span class="kw">use </span><span class="kw">crate</span>::math::{CoordsCartesian, CoordsSpherical};
@@ -117,6 +123,12 @@
 ///
 /// For VL53L5CX: resolution either 4x4 or 8x8.
 </span><span class="kw">pub const </span>RES_Y: usize = <span class="number">8</span>;
+
+
+<span class="doccomment">/// The history size.
+///
+/// Must be large enough to hold at least ca 2secs of data to be able to reliably recognize gestures.
+</span><span class="kw">pub const </span>HISTORY_SIZE: usize = <span class="number">60</span>;
 
 <span class="doccomment">/// Creates an invalid measurement ( distances are set to -1.0 )
 </span><span class="attr">#[no_mangle]
@@ -150,14 +162,14 @@
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>gesture_recognizer_new(
     params: RecognizerParams,
     sensor_params: SensorParams,
-) -&gt; GestureRecognizer&lt;RES_X, RES_Y&gt; {
+) -&gt; GestureRecognizer&lt;RES_X, RES_Y, HISTORY_SIZE&gt; {
     GestureRecognizer::new(params, sensor_params)
 }
 
 <span class="doccomment">/// Resets the gesture recognizer with the given parameters. Clears the history, ongoing predictions and resets the internal state.
 </span><span class="attr">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>gesture_recognizer_reset(
-    gesture_recognizer: <span class="kw-2">&amp;mut </span>GestureRecognizer&lt;RES_X, RES_Y&gt;,
+    gesture_recognizer: <span class="kw-2">&amp;mut </span>GestureRecognizer&lt;RES_X, RES_Y, HISTORY_SIZE&gt;,
     params: RecognizerParams,
     sensor_params: SensorParams,
     now: u32,
@@ -170,7 +182,7 @@
 /// The time in the measurement must be monotonically increasing (usually coming from a systick timer)
 </span><span class="attr">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>gesture_recognizer_update(
-    gesture_recognizer: <span class="kw-2">&amp;mut </span>GestureRecognizer&lt;RES_X, RES_Y&gt;,
+    gesture_recognizer: <span class="kw-2">&amp;mut </span>GestureRecognizer&lt;RES_X, RES_Y, HISTORY_SIZE&gt;,
     measurement: SensorMeasurement&lt;RES_X, RES_Y&gt;,
     gesture_result: <span class="kw-2">&amp;mut </span>RecognizerResult,
 ) -&gt; RecognizerStatus {
