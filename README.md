@@ -1,7 +1,9 @@
 # wave
 
-[![main docs](https://img.shields.io/badge/docs-main-informational)](https://flxzt.github.io/wave/wave/)
+[![crates.io](https://img.shields.io/crates/v/wave)](https://crates.io/crates/wave)
+[![docs.rs](https://docs.rs/wave/badge.svg)](https://docs.rs/wave/)
 [![CI](https://github.com/flxzt/wave/actions/workflows/ci.yaml/badge.svg)](https://github.com/flxzt/wave/actions/workflows/ci.yaml)
+[![docs main](https://img.shields.io/badge/docs-main-informational)](https://flxzt.github.io/wave/wave/)
 
 A no-std no-alloc gesture recognition library for low resolution TOF-Sensors
 
