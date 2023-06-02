@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["cbind","C Bindings"],["math","Math Utilities"],["measurements","Sensor Measurements"],["recognizer","Gesture Recognizer"]]};
+window.SIDEBAR_ITEMS = {"mod":["cbind","math","measurements","recognizer"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["Gesture","Represents a hand gesture"],["RecognizerStatus","The status of the gesture recognizer"]],"struct":[["GestureRecognizer","The gesture recognizer."],["RecognizerParams","Parameters for gesture recognition"],["RecognizerResult","A gesture prediction result"]]};
+window.SIDEBAR_ITEMS = {"enum":["Gesture","RecognizerStatus"],"struct":["GestureRecognizer","RecognizerParams","RecognizerResult"]};
