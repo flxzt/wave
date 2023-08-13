@@ -344,9 +344,6 @@
 <a href="#344" id="344">344</a>
 <a href="#345" id="345">345</a>
 <a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Gesture Recognizer
 //!
 //! All distance values are considered to be in millimeter.
@@ -355,32 +352,32 @@
 <span class="kw">use </span><span class="kw">crate</span>::measurements::SensorParams;
 <span class="kw">use crate</span>::{measurements, HandState, SensorMeasurement};
 
-<span class="doccomment">/// Represents a hand gesture
+<span class="doccomment">/// A hand gesture.
 </span><span class="attr">#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[non_exhaustive]
 </span><span class="kw">pub enum </span>Gesture {
-    <span class="doccomment">/// No recognized gesture
+    <span class="doccomment">/// No recognized gesture.
     </span>GestureNone = <span class="number">0</span>,
-    <span class="doccomment">/// A static hold
+    <span class="doccomment">/// A static hold.
     </span>GestureStaticHold,
-    <span class="doccomment">/// A right swipe
+    <span class="doccomment">/// A right swipe.
     </span>GestureSwipeRight,
-    <span class="doccomment">/// A left swipe
+    <span class="doccomment">/// A left swipe.
     </span>GestureSwipeLeft,
-    <span class="doccomment">/// A up swipe
+    <span class="doccomment">/// A up swipe.
     </span>GestureSwipeUp,
-    <span class="doccomment">/// A down swipe
+    <span class="doccomment">/// A down swipe.
     </span>GestureSwipeDown,
 }
 
-<span class="doccomment">/// A gesture prediction result
+<span class="doccomment">/// A gesture prediction result.
 </span><span class="attr">#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 </span><span class="kw">pub struct </span>RecognizerResult {
-    <span class="doccomment">/// The current hand state
+    <span class="doccomment">/// The current hand state.
     </span><span class="kw">pub </span>hand_state: HandState,
-    <span class="doccomment">/// The recognized gesture, GestureNone if no gesture was recognized
+    <span class="doccomment">/// The recognized gesture, GestureNone if no gesture was recognized.
     </span><span class="kw">pub </span>gesture: Gesture,
 }
 
@@ -393,21 +390,21 @@
     }
 }
 
-<span class="doccomment">/// Parameters for gesture recognition
+<span class="doccomment">/// Parameters for gesture recognition.
 </span><span class="attr">#[repr(C)]
 #[derive(Debug, Clone, Copy)]
 </span><span class="kw">pub struct </span>RecognizerParams {
-    <span class="doccomment">/// The furthest hand distance for gesture recognition
+    <span class="doccomment">/// The furthest hand distance for gesture recognition.
     </span><span class="kw">pub </span>gesture_threshold_dist: f32,
-    <span class="doccomment">/// The time the hand has to be still to recognize a static hold
+    <span class="doccomment">/// The time the hand has to be still to recognize a static hold.
     </span><span class="kw">pub </span>static_hold_time_ms: u32,
-    <span class="doccomment">/// How much the hand can move towards / away from the sensor while doing a static hold
+    <span class="doccomment">/// How much the hand can move towards / away from the sensor while doing a static hold.
     </span><span class="kw">pub </span>static_hold_tolerance_dist: f32,
-    <span class="doccomment">/// How much the hand can move towards / away from the sensor while doing a swipe
+    <span class="doccomment">/// How much the hand can move towards / away from the sensor while doing a swipe.
     </span><span class="kw">pub </span>swipe_tolerance_dist: f32,
-    <span class="doccomment">/// How much distance the hand has to travel to detect a horizontal swipe
+    <span class="doccomment">/// How much distance the hand has to travel to detect a horizontal swipe.
     </span><span class="kw">pub </span>swipe_horizontal_travel_dist: f32,
-    <span class="doccomment">/// How much distance the hand has to travel to detect a vertical swipe
+    <span class="doccomment">/// How much distance the hand has to travel to detect a vertical swipe.
     </span><span class="kw">pub </span>swipe_vertical_travel_dist: f32,
 }
 
@@ -424,16 +421,16 @@
     }
 }
 
-<span class="doccomment">/// The status of the gesture recognizer
+<span class="doccomment">/// The status of the gesture recognizer.
 </span><span class="attr">#[repr(C)]
 #[non_exhaustive]
 #[derive(Debug, Clone, Copy)]
 </span><span class="kw">pub enum </span>RecognizerStatus {
-    <span class="doccomment">/// Ok
+    <span class="doccomment">/// Ok.
     </span>RecognizerStatusOk = <span class="number">0</span>,
-    <span class="doccomment">/// Indicates a failure while the recognizer was initialized
+    <span class="doccomment">/// Indicates a failure while the recognizer was initialized.
     </span>RecognizerStatusInitFailure,
-    <span class="doccomment">/// Indicates invalid input to the recognizer
+    <span class="doccomment">/// Indicates invalid input to the recognizer.
     </span>RecognizerStatusInvalidInput,
 }
 
@@ -453,34 +450,6 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>iter_history_newer&lt;
-    <span class="kw">const </span>RES_X: usize,
-    <span class="kw">const </span>RES_Y: usize,
-    T: IntoIterator&lt;Item = HistoryEntry&lt;RES_X, RES_Y&gt;&gt;,
-&gt;(
-    entries: T,
-    newer_than_ms: u32,
-    now: u32,
-) -&gt; <span class="kw">impl </span>Iterator&lt;Item = HistoryEntry&lt;RES_X, RES_Y&gt;&gt; {
-    entries
-        .into_iter()
-        .filter(<span class="kw">move </span>|e| now - e.measurement.time_ms &lt; newer_than_ms)
-}
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>iter_history_older_eq&lt;
-    <span class="kw">const </span>RES_X: usize,
-    <span class="kw">const </span>RES_Y: usize,
-    T: IntoIterator&lt;Item = HistoryEntry&lt;RES_X, RES_Y&gt;&gt;,
-&gt;(
-    entries: T,
-    older_eq_ms: u32,
-    now: u32,
-) -&gt; <span class="kw">impl </span>Iterator&lt;Item = HistoryEntry&lt;RES_X, RES_Y&gt;&gt; {
-    entries
-        .into_iter()
-        .filter(<span class="kw">move </span>|e| now - e.measurement.time_ms &gt;= older_eq_ms)
-}
-
 <span class="doccomment">/// The gesture recognizer.
 ///
 /// Is initially configured through parameters and gets fed measurements and time and predicts gestures.
@@ -497,7 +466,7 @@
 <span class="kw">impl</span>&lt;<span class="kw">const </span>RES_X: usize, <span class="kw">const </span>RES_Y: usize, <span class="kw">const </span>HISTORY_SIZE: usize&gt;
     GestureRecognizer&lt;RES_X, RES_Y, HISTORY_SIZE&gt;
 {
-    <span class="doccomment">/// A new gesture recognizer with the given parameters.
+    <span class="doccomment">/// A new gesture recognizer initialized with the given parameters.
     ///
     /// The sensor parameters have preconfigured defaults for common TOF-Sensors such as the ST VL53L5CX.
     </span><span class="kw">pub fn </span>new(params: RecognizerParams, sensor_params: SensorParams) -&gt; <span class="self">Self </span>{
@@ -533,9 +502,9 @@
     </span><span class="kw">pub fn </span>update(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         measurement: SensorMeasurement&lt;RES_X, RES_Y&gt;,
-        recognizer_result: <span class="kw-2">&amp;mut </span>RecognizerResult,
+        result: <span class="kw-2">&amp;mut </span>RecognizerResult,
     ) -&gt; RecognizerStatus {
-        <span class="kw-2">*</span>recognizer_result = RecognizerResult::default();
+        <span class="kw-2">*</span>result = RecognizerResult::default();
         <span class="kw">let </span>now = measurement.time_ms;
 
         <span class="comment">// Time must be monotonically increasing
@@ -545,37 +514,34 @@
 
         <span class="kw">let </span>hand_state =
             measurement.recognize_hand(<span class="kw-2">&amp;</span><span class="self">self</span>.sensor_params, <span class="self">self</span>.params.gesture_threshold_dist);
-
         <span class="self">self</span>.push_to_history(HistoryEntry {
             measurement,
             hand_state,
         });
-
-        recognizer_result.hand_state = hand_state;
-
-        recognizer_result.gesture = <span class="self">self</span>.recognize_gesture(now);
+        result.hand_state = hand_state;
+        result.gesture = <span class="self">self</span>.recognize_gesture(now);
 
         RecognizerStatus::RecognizerStatusOk
     }
 
-    <span class="doccomment">/// Gets the current configured sensor parameters
-    </span><span class="kw">pub fn </span>get_sensor_params(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SensorParams {
+    <span class="doccomment">/// Gets the current configured sensor parameters.
+    </span><span class="kw">pub fn </span>sensor_params(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SensorParams {
         <span class="self">self</span>.sensor_params
     }
 
-    <span class="doccomment">/// Gets the current configured gesture recognizer parameters
-    </span><span class="kw">pub fn </span>get_params(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RecognizerParams {
+    <span class="doccomment">/// Gets the current configured gesture recognizer parameters.
+    </span><span class="kw">pub fn </span>params(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RecognizerParams {
         <span class="self">self</span>.params
     }
 
-    <span class="doccomment">/// Pushes an entry to the history
+    <span class="doccomment">/// Pushes an entry to the history.
     </span><span class="kw">fn </span>push_to_history(<span class="kw-2">&amp;mut </span><span class="self">self</span>, entry: HistoryEntry&lt;RES_X, RES_Y&gt;) {
         <span class="self">self</span>.history.rotate_right(<span class="number">1</span>);
         <span class="self">self</span>.history[<span class="number">0</span>] = entry;
         <span class="self">self</span>.received_measurements += <span class="number">1</span>;
     }
 
-    <span class="doccomment">/// Clears the history and fills it with invalid measurements and state (all dist values set to -1.0)
+    <span class="doccomment">/// Clears the history and fills it with invalid measurements and state (all dist values set to -1.0).
     </span><span class="kw">fn </span>clear_history(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">for </span>entry <span class="kw">in </span><span class="self">self</span>.history.iter_mut() {
             <span class="kw-2">*</span>entry = HistoryEntry::invalid();
@@ -695,5 +661,33 @@
 
         Gesture::GestureNone
     }
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>iter_history_newer&lt;
+    <span class="kw">const </span>RES_X: usize,
+    <span class="kw">const </span>RES_Y: usize,
+    T: IntoIterator&lt;Item = HistoryEntry&lt;RES_X, RES_Y&gt;&gt;,
+&gt;(
+    entries: T,
+    newer_than_ms: u32,
+    now: u32,
+) -&gt; <span class="kw">impl </span>Iterator&lt;Item = HistoryEntry&lt;RES_X, RES_Y&gt;&gt; {
+    entries
+        .into_iter()
+        .filter(<span class="kw">move </span>|e| now - e.measurement.time_ms &lt; newer_than_ms)
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>iter_history_older_eq&lt;
+    <span class="kw">const </span>RES_X: usize,
+    <span class="kw">const </span>RES_Y: usize,
+    T: IntoIterator&lt;Item = HistoryEntry&lt;RES_X, RES_Y&gt;&gt;,
+&gt;(
+    entries: T,
+    older_eq_ms: u32,
+    now: u32,
+) -&gt; <span class="kw">impl </span>Iterator&lt;Item = HistoryEntry&lt;RES_X, RES_Y&gt;&gt; {
+    entries
+        .into_iter()
+        .filter(<span class="kw">move </span>|e| now - e.measurement.time_ms &gt;= older_eq_ms)
 }
 </code></pre></div></section></main></body></html>

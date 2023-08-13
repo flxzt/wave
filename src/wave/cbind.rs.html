@@ -99,7 +99,10 @@
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! C Bindings
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! C Bindings.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::math::{CoordsCartesian, CoordsSpherical};
 <span class="kw">use </span><span class="kw">crate</span>::measurements::SensorParams;
@@ -128,26 +131,27 @@
 /// Must be large enough to hold at least ca 2 seconds of data to be able to reliably recognize gestures.
 </span><span class="kw">pub const </span>HISTORY_SIZE: usize = <span class="number">60</span>;
 
-<span class="doccomment">/// Creates an invalid measurement ( distances are set to -1.0 )
+<span class="doccomment">/// Creates an invalid measurement (distances are set to `-1.0`).
 </span><span class="attr">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>sensor_measurement_invalid() -&gt; SensorMeasurement&lt;RES_X, RES_Y&gt; {
     SensorMeasurement::&lt;RES_X, RES_Y&gt;::invalid()
 }
 
-<span class="doccomment">/// Default sensor parameters for the ST VL53L5CX TOF-Sensor
+<span class="doccomment">/// Default sensor parameters for the ST VL53L5CX TOF-Sensor.
 </span><span class="attr">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>sensor_params_default_vl53l5cx() -&gt; SensorParams {
     SensorParams::default_vl53l5cx()
 }
 
-<span class="doccomment">/// Default recognizer parameters, providing a good starting point for gesture recognition
+<span class="doccomment">/// Default recognizer parameters, providing a good starting point for gesture recognition.
 </span><span class="attr">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>recognizer_params_default() -&gt; RecognizerParams {
     RecognizerParams::default()
 }
 
-<span class="doccomment">/// Default result, meaning no hand is found and no gestures are recognized. Used to initialize the result before passing
-/// it to the recognizer
+<span class="doccomment">/// Default result, meaning no hand is found and no gestures are recognized.
+///
+/// Used to initialize the result before passing it to the recognizer.
 </span><span class="attr">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>recognizer_result_default() -&gt; RecognizerResult {
     RecognizerResult::default()
@@ -155,7 +159,7 @@
 
 <span class="doccomment">/// A new gesture recognizer with the given parameters.
 ///
-/// The sensor parameters have preconfigured defaults for common TOF-Sensors such as the ST VL53L5CX
+/// The sensor parameters have preconfigured defaults for common TOF-Sensors such as the ST VL53L5CX.
 </span><span class="attr">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>gesture_recognizer_new(
     params: RecognizerParams,
@@ -164,7 +168,9 @@
     GestureRecognizer::new(params, sensor_params)
 }
 
-<span class="doccomment">/// Resets the gesture recognizer with the given parameters. Clears the history, ongoing predictions and resets the internal state.
+<span class="doccomment">/// Resets the gesture recognizer with the given parameters.
+///
+/// Clears the history, ongoing predictions and resets the internal state.
 </span><span class="attr">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>gesture_recognizer_reset(
     gesture_recognizer: <span class="kw-2">&amp;mut </span>GestureRecognizer&lt;RES_X, RES_Y, HISTORY_SIZE&gt;,
@@ -177,7 +183,7 @@
 
 <span class="doccomment">/// Updates the gesture recognizer with a new measurement and time.
 ///
-/// The time in the measurement must be monotonically increasing (usually coming from a systick timer)
+/// The time in the measurement must be monotonically increasing (usually coming from a systick timer).
 </span><span class="attr">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>gesture_recognizer_update(
     gesture_recognizer: <span class="kw-2">&amp;mut </span>GestureRecognizer&lt;RES_X, RES_Y, HISTORY_SIZE&gt;,
@@ -187,13 +193,13 @@
     gesture_recognizer.update(measurement, gesture_result)
 }
 
-<span class="doccomment">/// Converts cartesian to spherical coordinates
+<span class="doccomment">/// Converts cartesian to spherical coordinates.
 </span><span class="attr">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>coords_spherical_from_cartesian(coords_cart: CoordsCartesian) -&gt; CoordsSpherical {
     coords_cart.into()
 }
 
-<span class="doccomment">/// Converts spherical to cartesian coordinates
+<span class="doccomment">/// Converts spherical to cartesian coordinates.
 </span><span class="attr">#[no_mangle]
 </span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>coords_cartesian_from_spherical(
     coords_spher: CoordsSpherical,
