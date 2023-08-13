@@ -1,4 +1,4 @@
-//! Sensor Measurements
+//! Sensor Measurements.
 
 use core::f32::consts::FRAC_PI_2;
 
@@ -8,11 +8,11 @@ use crate::math::{CoordsCartesian, CoordsSpherical};
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub enum HandState {
-    /// No hand was found
+    /// No hand was found.
     HandNotFound,
-    /// Hand was found with this position
+    /// Hand was found with this position.
     HandFound {
-        /// The hand position in spherical coordinates
+        /// The hand position in spherical coordinates.
         hand_pos: CoordsSpherical,
     },
 }
@@ -21,9 +21,9 @@ pub enum HandState {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct SensorParams {
-    /// The horizontal FOV of the sensor
+    /// The horizontal FOV of the sensor.
     pub fov_horizontal: f32,
-    /// The verctical FOV of the sensor
+    /// The vertical FOV of the sensor.
     pub fov_vertical: f32,
 }
 
@@ -41,20 +41,20 @@ impl SensorParams {
 /// Represents a sensor measurement coming from the TOF sensor.
 ///
 /// Expects that the zones are already rotated and mirrored,
-/// so that the zone with index \[0\]\[0\] is the top left corner when looking at the sensor
+/// so that the zone with index \[0\]\[0\] is the top left corner when looking at the sensor.
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct SensorMeasurement<const RES_X: usize, const RES_Y: usize> {
     /// The measured distances of each zone.
     ///
-    /// Invalid distance measurements are represented by value -1.0
+    /// Invalid distance measurements are represented by value -1.0.
     pub zone_dist: [[f32; RES_X]; RES_Y],
     /// The time of the measurement in milliseconds. Must be monotonically increasing.
     pub time_ms: u32,
 }
 
 impl<const RES_X: usize, const RES_Y: usize> SensorMeasurement<RES_X, RES_Y> {
-    /// Creates a new measurement
+    /// Creates a new measurement.
     pub fn new(zone_dist: [[f32; RES_X]; RES_Y]) -> Self {
         Self {
             zone_dist,
@@ -62,7 +62,7 @@ impl<const RES_X: usize, const RES_Y: usize> SensorMeasurement<RES_X, RES_Y> {
         }
     }
 
-    /// An invalid measurement. The time is set to zero, distances are set to invalid ( value -1.0)
+    /// An invalid measurement. The time is set to zero, distances are set to invalid (value `-1.0`).
     pub fn invalid() -> Self {
         Self {
             zone_dist: [[-1.0; RES_X]; RES_Y],
@@ -70,9 +70,9 @@ impl<const RES_X: usize, const RES_Y: usize> SensorMeasurement<RES_X, RES_Y> {
         }
     }
 
-    /// Finds the position in the matrix and distance value of the zone with minimal distance
+    /// Finds the position in the matrix and distance value of the zone with minimal distance.
     ///
-    /// Returns the tuple: (["x-pos in matrix", "y-pos in matrix"], "distance")
+    /// Returns the tuple: (["x-pos in matrix", "y-pos in matrix"], "distance").
     pub(crate) fn min_dist(&self) -> ([usize; 2], f32) {
         self.zone_dist
             .into_iter()
@@ -110,7 +110,7 @@ impl<const RES_X: usize, const RES_Y: usize> SensorMeasurement<RES_X, RES_Y> {
         columns
     }
 
-    /// Attempts to recognize a hand from the measurement and finds its position, distance, etc.
+    /// Attempts to recognize a hand from the measurement and finds its position, distance, etc. .
     pub(crate) fn recognize_hand(&self, params: &SensorParams, threshold_dist: f32) -> HandState {
         let hand_pos = self.hand_pos(params);
 
@@ -137,20 +137,20 @@ impl<const RES_X: usize, const RES_Y: usize> SensorMeasurement<RES_X, RES_Y> {
         let (min_dist_zone_pos, _min_dist) = self.min_dist();
         let min_pos_spher = zones_pos[min_dist_zone_pos[1]][min_dist_zone_pos[0]];
 
-        // Then calculate the the hand position as weighted average mean, given the smallest distance as initial position and weighing in the distance of the other measurements to it.
+        // Then calculate the the hand position as weighted average mean,
+        // given the smallest distance as initial position and weighing in the distance of the other measurements to it.
 
-        // calculates the weight of the positions in regards to min_pos for the weighted average mean
+        // Calculates the weight of the positions in regards to min_pos for the weighted average mean
         fn pos_weight(min_pos: &CoordsCartesian, other: &CoordsCartesian) -> f32 {
             /// This is the factor that determines how much the distance weighs in into the average mean.
             ///
-            /// E.g. a factor of 10.0 means that a position 1cm away from the measurement with min dist weighs in with 10.0,
-            /// a position 2cm away weighs in with 5.0.
+            /// E.g. a factor of 10.0 means that a position 1cm away from the measurement with min dist weighs in with
+            /// value 10.0, a position 2cm away weighs in with value 5.0.
             const WEIGHT_FACTOR: f32 = 100.0;
 
             let dist_to = min_pos.dist_to(other);
 
             WEIGHT_FACTOR / dist_to
-            //1.0 / dist_to
         }
 
         // The sum of the positions multiplied by the weight (numerator of the weighted mean)
@@ -163,7 +163,7 @@ impl<const RES_X: usize, const RES_Y: usize> SensorMeasurement<RES_X, RES_Y> {
                     let c_cart = CoordsCartesian::from(zones_pos[pos_y][pos_x]);
 
                     let weight = if pos_x == min_dist_zone_pos[0] && pos_y == min_dist_zone_pos[1] {
-                        // if we are the zone with min dist, skip the weight calc
+                        // if this is the zone with min dist, skip the weight calc
                         1.0
                     } else {
                         pos_weight(&min_pos_spher.into(), &c_cart)
@@ -193,7 +193,7 @@ impl<const RES_X: usize, const RES_Y: usize> SensorMeasurement<RES_X, RES_Y> {
                     let c_cart = CoordsCartesian::from(zones_pos[pos_y][pos_x]);
 
                     let weight = if pos_x == min_dist_zone_pos[0] && pos_y == min_dist_zone_pos[1] {
-                        // if we are the zone with min dist, skip the weight calc
+                        // if this is the zone with min dist, skip the weight calc
                         1.0
                     } else {
                         pos_weight(&min_pos_spher.into(), &c_cart)
@@ -230,11 +230,13 @@ impl<const RES_X: usize, const RES_Y: usize> SensorMeasurement<RES_X, RES_Y> {
 }
 
 /// Calculates the position in space for the measurement in a sensor zone.
-/// dist: the distance value of the measurement
-/// zone_pos_x: The x-index of the zone in the sensor grid
-/// zone_pos_y: The y-index of the zone in the sensor grid
 ///
-/// Returns the position in spherical coordinates
+/// Arguments:
+/// - dist: the distance value of the measurement
+/// - zone_pos_x: The x-index of the zone in the sensor grid
+/// - zone_pos_y: The y-index of the zone in the sensor grid
+///
+/// Returns the position in spherical coordinates.
 pub(crate) fn dist_position_spher<const RES_X: usize, const RES_Y: usize>(
     dist: f32,
     zone_pos_x: usize,
@@ -259,7 +261,9 @@ pub(crate) fn dist_position_spher<const RES_X: usize, const RES_Y: usize>(
 
 /// Finds the nearest zone for all given measurements.
 ///
-/// Returns the tuple: ("index of the measurement containing the nearest zone", ["x-pos in matrix", "y-pos in matrix"], "distance")
+/// Returns the tuple:
+///
+/// `("index of the measurement containing the nearest zone", ["x-pos in matrix", "y-pos in matrix"], "distance")`
 pub(crate) fn find_nearest_zone<
     const RES_X: usize,
     const RES_Y: usize,
@@ -282,9 +286,12 @@ pub(crate) fn find_nearest_zone<
 }
 
 /// Finds the nearest hand position for all given hand states.
-/// If the iterator contains no valid hand state, it returns index 0 and invalid spherical coordinates
 ///
-/// Returns the tuple: ("index of the hand state containing the nearest pos", "hand pos")
+/// If the iterator contains no valid hand state, it returns index 0 and invalid spherical coordinates.
+///
+/// Returns the tuple:
+///
+/// `("index of the hand state containing the nearest pos", "hand pos")`
 #[allow(dead_code)]
 pub(crate) fn find_nearest_hand_pos<T: IntoIterator<Item = HandState>>(
     states: T,

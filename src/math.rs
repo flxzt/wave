@@ -1,14 +1,17 @@
-//! Math Utilities
+//! Math Utilities.
 
-/// Cartesian coordinates
+use core::iter::Sum;
+use core::ops::{Add, Div, Sub};
+
+/// Cartesian coordinates.
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct CoordsCartesian {
-    /// The distance to the origin on the x-axis
+    /// The distance to the origin on the x-axis.
     pub x: f32,
-    /// The distance to the origin on the y-axis
+    /// The distance to the origin on the y-axis.
     pub y: f32,
-    /// The distance to the origin on the z-axis
+    /// The distance to the origin on the z-axis.
     pub z: f32,
 }
 
@@ -23,7 +26,7 @@ impl From<CoordsSpherical> for CoordsCartesian {
 }
 
 impl CoordsCartesian {
-    /// The origin
+    /// The origin.
     pub fn zero() -> Self {
         Self {
             x: 0.0,
@@ -32,7 +35,7 @@ impl CoordsCartesian {
         }
     }
 
-    /// Calculates the euclidean distance to other
+    /// Calculates the euclidean distance to other.
     pub fn dist_to(&self, other: &Self) -> f32 {
         libm::sqrtf(
             libm::powf(self.x - other.x, 2.0)
@@ -42,15 +45,16 @@ impl CoordsCartesian {
     }
 }
 
-/// Represents spherical coordinates in mathematical naming convention. ( [Reference](https://mathworld.wolfram.com/SphericalCoordinates.html) )
+/// Represents spherical coordinates in mathematical naming convention.
+/// ([Reference](https://mathworld.wolfram.com/SphericalCoordinates.html))
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub struct CoordsSpherical {
-    /// Distance to the origin
+    /// Distance to the origin.
     pub r: f32,
-    /// Angle with respect to x-axis (azimuth) (rad)
+    /// Angle with respect to x-axis (azimuth) (rad).
     pub theta: f32,
-    /// Angle with respect to polar / z-axis (zenith) (rad)
+    /// Angle with respect to polar / z-axis (zenith) (rad).
     pub phi: f32,
 }
 
@@ -67,7 +71,7 @@ impl From<CoordsCartesian> for CoordsSpherical {
 }
 
 impl CoordsSpherical {
-    /// Returns invalid coordinates ( r is set to -1.0 )
+    /// Returns invalid coordinates (`r` is set to `-1.0`).
     pub fn invalid() -> Self {
         Self {
             r: -1.0,
@@ -76,12 +80,12 @@ impl CoordsSpherical {
         }
     }
 
-    /// Checks if the coorindate is invalid ( r is < 0.0 )
+    /// Checks if the coorindate is invalid (`r` is < `0.0`).
     pub fn is_invalid(&self) -> bool {
         self.r < 0.0
     }
 
-    /// Origin coordinates (r, theta and phi are set to 0.0 )
+    /// Origin coordinates (`r`, `theta` and `phi` are set to `0.0`).
     pub fn zero() -> Self {
         Self {
             r: 0.0,
@@ -91,7 +95,7 @@ impl CoordsSpherical {
     }
 }
 
-/// Transposes the given matrix
+/// Transposes the given matrix.
 pub fn matrix_2d_transpose<const ROWS: usize, const COLS: usize, T>(
     matrix: [[T; COLS]; ROWS],
 ) -> [[T; ROWS]; COLS]
@@ -109,7 +113,7 @@ where
     transposed
 }
 
-/// Rotates the matrix 90 degrees in clockwise direction
+/// Rotates the matrix 90 degrees in clockwise direction.
 pub fn matrix_2d_rotate_90deg<const ROWS: usize, const COLS: usize, T>(
     matrix: [[T; COLS]; ROWS],
 ) -> [[T; ROWS]; COLS]
@@ -119,7 +123,7 @@ where
     matrix_2d_reverse_rows(matrix_2d_transpose(matrix))
 }
 
-/// Rotates the matrix 180 degrees
+/// Rotates the matrix 180 degrees.
 pub fn matrix_2d_rotate_180deg<const ROWS: usize, const COLS: usize, T>(
     matrix: [[T; COLS]; ROWS],
 ) -> [[T; COLS]; ROWS]
@@ -129,7 +133,7 @@ where
     matrix_2d_reverse_rows(matrix_2d_reverse_cols(matrix))
 }
 
-/// Rotates the matrix 270 degrees in clockwise direction
+/// Rotates the matrix 270 degrees in clockwise direction.
 pub fn matrix_2d_rotate_270deg<const ROWS: usize, const COLS: usize, T>(
     matrix: [[T; COLS]; ROWS],
 ) -> [[T; ROWS]; COLS]
@@ -139,7 +143,7 @@ where
     matrix_2d_reverse_cols(matrix_2d_transpose(matrix))
 }
 
-/// Mirror / reverse the columns of the matrix
+/// Mirror / reverse the columns of the matrix.
 pub fn matrix_2d_reverse_cols<const ROWS: usize, const COLS: usize, T>(
     mut matrix: [[T; COLS]; ROWS],
 ) -> [[T; COLS]; ROWS]
@@ -151,7 +155,7 @@ where
     matrix
 }
 
-/// Mirror / reverse the rows of the matrix
+/// Mirror / reverse the rows of the matrix.
 pub fn matrix_2d_reverse_rows<const ROWS: usize, const COLS: usize, T>(
     mut matrix: [[T; COLS]; ROWS],
 ) -> [[T; COLS]; ROWS]
@@ -165,12 +169,77 @@ where
     matrix
 }
 
+/// Iterator adapter that calculates the moving average.
+#[derive(Debug, Clone)]
+pub struct MovingAvg<I, T>
+where
+    I: Clone,
+    T: Clone,
+{
+    iter: I,
+    window_size: u32,
+    moving_sum: Option<T>,
+}
+
+impl<I, T> Iterator for MovingAvg<I, T>
+where
+    I: ExactSizeIterator<Item = T> + Clone,
+    T: Clone + Add<Output = T> + Sub<Output = T> + Div<Output = T> + Sum + From<u32>,
+{
+    type Item = T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(moving_sum) = self.moving_sum.as_mut() {
+            let window_next = self.iter.clone().nth(self.window_size as usize)?;
+            let window_prev = self.iter.next()?;
+
+            *moving_sum = moving_sum.clone() - window_prev + window_next;
+        } else {
+            self.moving_sum = Some(self.iter.clone().take(self.window_size as usize).sum());
+        }
+        Some(self.moving_sum.clone().unwrap() / self.window_size.into())
+    }
+}
+
+impl<I, T> MovingAvg<I, T>
+where
+    I: Clone,
+    T: Clone,
+{
+    /// A new moving average iterator adapter.
+    pub fn new(iter: I, window_size: u32) -> Self {
+        Self {
+            iter,
+            window_size,
+            moving_sum: None,
+        }
+    }
+}
+
+/// The iterator trait for [MovingAvg].
+pub trait MovingAvgIter<T>: Iterator<Item = T> + Sized
+where
+    Self: Clone,
+    T: Clone,
+{
+    /// Calculate the moving average with the given window size.
+    fn moving_avg(self, window_size: u32) -> MovingAvg<Self, T> {
+        MovingAvg::new(self, window_size)
+    }
+}
+
+impl<I, T> MovingAvgIter<T> for I
+where
+    I: Iterator<Item = T> + Clone,
+    T: Clone,
+{
+}
+
 #[cfg(test)]
 mod tests {
+    use super::{CoordsCartesian, CoordsSpherical, MovingAvgIter};
     use approx::assert_relative_eq;
     use pretty_assertions::assert_eq;
-
-    use super::{CoordsCartesian, CoordsSpherical};
 
     #[test]
     fn coords_cart_to_spher() {
@@ -317,5 +386,22 @@ mod tests {
                 [5.5, 4.5, 3.5, 2.5],
             ]
         );
+    }
+
+    #[test]
+    fn moving_avg() {
+        const WINDOW_SIZE: usize = 3;
+        let samples: [f64; 8] = [5.0, 2.2, 3.8, 8.0, 4.1, 1.0, 2.5, 3.0];
+        let expected: [f64; 8 - WINDOW_SIZE + 1] = [
+            11. / 3.,
+            14. / 3.,
+            53. / 10.,
+            131. / 30.,
+            38. / 15.,
+            13. / 6.,
+        ];
+        for (i, res) in samples.into_iter().moving_avg(3).enumerate() {
+            assert_relative_eq!(expected[i], res, epsilon = 0.0001);
+        }
     }
 }

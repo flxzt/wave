@@ -6,32 +6,32 @@ use crate::math::CoordsCartesian;
 use crate::measurements::SensorParams;
 use crate::{measurements, HandState, SensorMeasurement};
 
-/// Represents a hand gesture
+/// A hand gesture.
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum Gesture {
-    /// No recognized gesture
+    /// No recognized gesture.
     GestureNone = 0,
-    /// A static hold
+    /// A static hold.
     GestureStaticHold,
-    /// A right swipe
+    /// A right swipe.
     GestureSwipeRight,
-    /// A left swipe
+    /// A left swipe.
     GestureSwipeLeft,
-    /// A up swipe
+    /// A up swipe.
     GestureSwipeUp,
-    /// A down swipe
+    /// A down swipe.
     GestureSwipeDown,
 }
 
-/// A gesture prediction result
+/// A gesture prediction result.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct RecognizerResult {
-    /// The current hand state
+    /// The current hand state.
     pub hand_state: HandState,
-    /// The recognized gesture, GestureNone if no gesture was recognized
+    /// The recognized gesture, GestureNone if no gesture was recognized.
     pub gesture: Gesture,
 }
 
@@ -44,21 +44,21 @@ impl Default for RecognizerResult {
     }
 }
 
-/// Parameters for gesture recognition
+/// Parameters for gesture recognition.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct RecognizerParams {
-    /// The furthest hand distance for gesture recognition
+    /// The furthest hand distance for gesture recognition.
     pub gesture_threshold_dist: f32,
-    /// The time the hand has to be still to recognize a static hold
+    /// The time the hand has to be still to recognize a static hold.
     pub static_hold_time_ms: u32,
-    /// How much the hand can move towards / away from the sensor while doing a static hold
+    /// How much the hand can move towards / away from the sensor while doing a static hold.
     pub static_hold_tolerance_dist: f32,
-    /// How much the hand can move towards / away from the sensor while doing a swipe
+    /// How much the hand can move towards / away from the sensor while doing a swipe.
     pub swipe_tolerance_dist: f32,
-    /// How much distance the hand has to travel to detect a horizontal swipe
+    /// How much distance the hand has to travel to detect a horizontal swipe.
     pub swipe_horizontal_travel_dist: f32,
-    /// How much distance the hand has to travel to detect a vertical swipe
+    /// How much distance the hand has to travel to detect a vertical swipe.
     pub swipe_vertical_travel_dist: f32,
 }
 
@@ -75,16 +75,16 @@ impl Default for RecognizerParams {
     }
 }
 
-/// The status of the gesture recognizer
+/// The status of the gesture recognizer.
 #[repr(C)]
 #[non_exhaustive]
 #[derive(Debug, Clone, Copy)]
 pub enum RecognizerStatus {
-    /// Ok
+    /// Ok.
     RecognizerStatusOk = 0,
-    /// Indicates a failure while the recognizer was initialized
+    /// Indicates a failure while the recognizer was initialized.
     RecognizerStatusInitFailure,
-    /// Indicates invalid input to the recognizer
+    /// Indicates invalid input to the recognizer.
     RecognizerStatusInvalidInput,
 }
 
@@ -104,34 +104,6 @@ impl<const RES_X: usize, const RES_Y: usize> HistoryEntry<RES_X, RES_Y> {
     }
 }
 
-pub(crate) fn iter_history_newer<
-    const RES_X: usize,
-    const RES_Y: usize,
-    T: IntoIterator<Item = HistoryEntry<RES_X, RES_Y>>,
->(
-    entries: T,
-    newer_than_ms: u32,
-    now: u32,
-) -> impl Iterator<Item = HistoryEntry<RES_X, RES_Y>> {
-    entries
-        .into_iter()
-        .filter(move |e| now - e.measurement.time_ms < newer_than_ms)
-}
-
-pub(crate) fn iter_history_older_eq<
-    const RES_X: usize,
-    const RES_Y: usize,
-    T: IntoIterator<Item = HistoryEntry<RES_X, RES_Y>>,
->(
-    entries: T,
-    older_eq_ms: u32,
-    now: u32,
-) -> impl Iterator<Item = HistoryEntry<RES_X, RES_Y>> {
-    entries
-        .into_iter()
-        .filter(move |e| now - e.measurement.time_ms >= older_eq_ms)
-}
-
 /// The gesture recognizer.
 ///
 /// Is initially configured through parameters and gets fed measurements and time and predicts gestures.
@@ -148,7 +120,7 @@ pub struct GestureRecognizer<const RES_X: usize, const RES_Y: usize, const HISTO
 impl<const RES_X: usize, const RES_Y: usize, const HISTORY_SIZE: usize>
     GestureRecognizer<RES_X, RES_Y, HISTORY_SIZE>
 {
-    /// A new gesture recognizer with the given parameters.
+    /// A new gesture recognizer initialized with the given parameters.
     ///
     /// The sensor parameters have preconfigured defaults for common TOF-Sensors such as the ST VL53L5CX.
     pub fn new(params: RecognizerParams, sensor_params: SensorParams) -> Self {
@@ -184,9 +156,9 @@ impl<const RES_X: usize, const RES_Y: usize, const HISTORY_SIZE: usize>
     pub fn update(
         &mut self,
         measurement: SensorMeasurement<RES_X, RES_Y>,
-        recognizer_result: &mut RecognizerResult,
+        result: &mut RecognizerResult,
     ) -> RecognizerStatus {
-        *recognizer_result = RecognizerResult::default();
+        *result = RecognizerResult::default();
         let now = measurement.time_ms;
 
         // Time must be monotonically increasing
@@ -196,37 +168,34 @@ impl<const RES_X: usize, const RES_Y: usize, const HISTORY_SIZE: usize>
 
         let hand_state =
             measurement.recognize_hand(&self.sensor_params, self.params.gesture_threshold_dist);
-
         self.push_to_history(HistoryEntry {
             measurement,
             hand_state,
         });
-
-        recognizer_result.hand_state = hand_state;
-
-        recognizer_result.gesture = self.recognize_gesture(now);
+        result.hand_state = hand_state;
+        result.gesture = self.recognize_gesture(now);
 
         RecognizerStatus::RecognizerStatusOk
     }
 
-    /// Gets the current configured sensor parameters
-    pub fn get_sensor_params(&self) -> SensorParams {
+    /// Gets the current configured sensor parameters.
+    pub fn sensor_params(&self) -> SensorParams {
         self.sensor_params
     }
 
-    /// Gets the current configured gesture recognizer parameters
-    pub fn get_params(&self) -> RecognizerParams {
+    /// Gets the current configured gesture recognizer parameters.
+    pub fn params(&self) -> RecognizerParams {
         self.params
     }
 
-    /// Pushes an entry to the history
+    /// Pushes an entry to the history.
     fn push_to_history(&mut self, entry: HistoryEntry<RES_X, RES_Y>) {
         self.history.rotate_right(1);
         self.history[0] = entry;
         self.received_measurements += 1;
     }
 
-    /// Clears the history and fills it with invalid measurements and state (all dist values set to -1.0)
+    /// Clears the history and fills it with invalid measurements and state (all dist values set to -1.0).
     fn clear_history(&mut self) {
         for entry in self.history.iter_mut() {
             *entry = HistoryEntry::invalid();
@@ -346,4 +315,32 @@ impl<const RES_X: usize, const RES_Y: usize, const HISTORY_SIZE: usize>
 
         Gesture::GestureNone
     }
+}
+
+pub(crate) fn iter_history_newer<
+    const RES_X: usize,
+    const RES_Y: usize,
+    T: IntoIterator<Item = HistoryEntry<RES_X, RES_Y>>,
+>(
+    entries: T,
+    newer_than_ms: u32,
+    now: u32,
+) -> impl Iterator<Item = HistoryEntry<RES_X, RES_Y>> {
+    entries
+        .into_iter()
+        .filter(move |e| now - e.measurement.time_ms < newer_than_ms)
+}
+
+pub(crate) fn iter_history_older_eq<
+    const RES_X: usize,
+    const RES_Y: usize,
+    T: IntoIterator<Item = HistoryEntry<RES_X, RES_Y>>,
+>(
+    entries: T,
+    older_eq_ms: u32,
+    now: u32,
+) -> impl Iterator<Item = HistoryEntry<RES_X, RES_Y>> {
+    entries
+        .into_iter()
+        .filter(move |e| now - e.measurement.time_ms >= older_eq_ms)
 }

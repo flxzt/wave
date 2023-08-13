@@ -34,49 +34,49 @@
 #define HISTORY_SIZE 60
 
 /**
- * Represents a hand gesture
+ * A hand gesture.
  */
 typedef enum Gesture {
   /**
-   * No recognized gesture
+   * No recognized gesture.
    */
   GestureNone = 0,
   /**
-   * A static hold
+   * A static hold.
    */
   GestureStaticHold,
   /**
-   * A right swipe
+   * A right swipe.
    */
   GestureSwipeRight,
   /**
-   * A left swipe
+   * A left swipe.
    */
   GestureSwipeLeft,
   /**
-   * A up swipe
+   * A up swipe.
    */
   GestureSwipeUp,
   /**
-   * A down swipe
+   * A down swipe.
    */
   GestureSwipeDown,
 } Gesture;
 
 /**
- * The status of the gesture recognizer
+ * The status of the gesture recognizer.
  */
 typedef enum RecognizerStatus {
   /**
-   * Ok
+   * Ok.
    */
   RecognizerStatusOk = 0,
   /**
-   * Indicates a failure while the recognizer was initialized
+   * Indicates a failure while the recognizer was initialized.
    */
   RecognizerStatusInitFailure,
   /**
-   * Indicates invalid input to the recognizer
+   * Indicates invalid input to the recognizer.
    */
   RecognizerStatusInvalidInput,
 } RecognizerStatus;
@@ -85,13 +85,13 @@ typedef enum RecognizerStatus {
  * Represents a sensor measurement coming from the TOF sensor.
  *
  * Expects that the zones are already rotated and mirrored,
- * so that the zone with index \[0\]\[0\] is the top left corner when looking at the sensor
+ * so that the zone with index \[0\]\[0\] is the top left corner when looking at the sensor.
  */
 typedef struct SensorMeasurement_RES_X__RES_Y {
   /**
    * The measured distances of each zone.
    *
-   * Invalid distance measurements are represented by value -1.0
+   * Invalid distance measurements are represented by value -1.0.
    */
   float zone_dist[RES_Y][RES_X];
   /**
@@ -105,59 +105,60 @@ typedef struct SensorMeasurement_RES_X__RES_Y {
  */
 typedef struct SensorParams {
   /**
-   * The horizontal FOV of the sensor
+   * The horizontal FOV of the sensor.
    */
   float fov_horizontal;
   /**
-   * The verctical FOV of the sensor
+   * The vertical FOV of the sensor.
    */
   float fov_vertical;
 } SensorParams;
 
 /**
- * Parameters for gesture recognition
+ * Parameters for gesture recognition.
  */
 typedef struct RecognizerParams {
   /**
-   * The furthest hand distance for gesture recognition
+   * The furthest hand distance for gesture recognition.
    */
   float gesture_threshold_dist;
   /**
-   * The time the hand has to be still to recognize a static hold
+   * The time the hand has to be still to recognize a static hold.
    */
   uint32_t static_hold_time_ms;
   /**
-   * How much the hand can move towards / away from the sensor while doing a static hold
+   * How much the hand can move towards / away from the sensor while doing a static hold.
    */
   float static_hold_tolerance_dist;
   /**
-   * How much the hand can move towards / away from the sensor while doing a swipe
+   * How much the hand can move towards / away from the sensor while doing a swipe.
    */
   float swipe_tolerance_dist;
   /**
-   * How much distance the hand has to travel to detect a horizontal swipe
+   * How much distance the hand has to travel to detect a horizontal swipe.
    */
   float swipe_horizontal_travel_dist;
   /**
-   * How much distance the hand has to travel to detect a vertical swipe
+   * How much distance the hand has to travel to detect a vertical swipe.
    */
   float swipe_vertical_travel_dist;
 } RecognizerParams;
 
 /**
- * Represents spherical coordinates in mathematical naming convention. ( [Reference](https://mathworld.wolfram.com/SphericalCoordinates.html) )
+ * Represents spherical coordinates in mathematical naming convention.
+ * ([Reference](https://mathworld.wolfram.com/SphericalCoordinates.html))
  */
 typedef struct CoordsSpherical {
   /**
-   * Distance to the origin
+   * Distance to the origin.
    */
   float r;
   /**
-   * Angle with respect to x-axis (azimuth) (rad)
+   * Angle with respect to x-axis (azimuth) (rad).
    */
   float theta;
   /**
-   * Angle with respect to polar / z-axis (zenith) (rad)
+   * Angle with respect to polar / z-axis (zenith) (rad).
    */
   float phi;
 } CoordsSpherical;
@@ -167,18 +168,18 @@ typedef struct CoordsSpherical {
  */
 typedef enum HandState_Tag {
   /**
-   * No hand was found
+   * No hand was found.
    */
   HandNotFound,
   /**
-   * Hand was found with this position
+   * Hand was found with this position.
    */
   HandFound,
 } HandState_Tag;
 
 typedef struct HandFound_Body {
   /**
-   * The hand position in spherical coordinates
+   * The hand position in spherical coordinates.
    */
   struct CoordsSpherical hand_pos;
 } HandFound_Body;
@@ -191,15 +192,15 @@ typedef struct HandState {
 } HandState;
 
 /**
- * A gesture prediction result
+ * A gesture prediction result.
  */
 typedef struct RecognizerResult {
   /**
-   * The current hand state
+   * The current hand state.
    */
   struct HandState hand_state;
   /**
-   * The recognized gesture, GestureNone if no gesture was recognized
+   * The recognized gesture, GestureNone if no gesture was recognized.
    */
   enum Gesture gesture;
 } RecognizerResult;
@@ -223,54 +224,57 @@ typedef struct GestureRecognizer_RES_X__RES_Y__HISTORY_SIZE {
 } GestureRecognizer_RES_X__RES_Y__HISTORY_SIZE;
 
 /**
- * Cartesian coordinates
+ * Cartesian coordinates.
  */
 typedef struct CoordsCartesian {
   /**
-   * The distance to the origin on the x-axis
+   * The distance to the origin on the x-axis.
    */
   float x;
   /**
-   * The distance to the origin on the y-axis
+   * The distance to the origin on the y-axis.
    */
   float y;
   /**
-   * The distance to the origin on the z-axis
+   * The distance to the origin on the z-axis.
    */
   float z;
 } CoordsCartesian;
 
 /**
- * Creates an invalid measurement ( distances are set to -1.0 )
+ * Creates an invalid measurement (distances are set to `-1.0`).
  */
 struct SensorMeasurement_RES_X__RES_Y sensor_measurement_invalid(void);
 
 /**
- * Default sensor parameters for the ST VL53L5CX TOF-Sensor
+ * Default sensor parameters for the ST VL53L5CX TOF-Sensor.
  */
 struct SensorParams sensor_params_default_vl53l5cx(void);
 
 /**
- * Default recognizer parameters, providing a good starting point for gesture recognition
+ * Default recognizer parameters, providing a good starting point for gesture recognition.
  */
 struct RecognizerParams recognizer_params_default(void);
 
 /**
- * Default result, meaning no hand is found and no gestures are recognized. Used to initialize the result before passing
- * it to the recognizer
+ * Default result, meaning no hand is found and no gestures are recognized.
+ *
+ * Used to initialize the result before passing it to the recognizer.
  */
 struct RecognizerResult recognizer_result_default(void);
 
 /**
  * A new gesture recognizer with the given parameters.
  *
- * The sensor parameters have preconfigured defaults for common TOF-Sensors such as the ST VL53L5CX
+ * The sensor parameters have preconfigured defaults for common TOF-Sensors such as the ST VL53L5CX.
  */
 struct GestureRecognizer_RES_X__RES_Y__HISTORY_SIZE gesture_recognizer_new(struct RecognizerParams params,
                                                                            struct SensorParams sensor_params);
 
 /**
- * Resets the gesture recognizer with the given parameters. Clears the history, ongoing predictions and resets the internal state.
+ * Resets the gesture recognizer with the given parameters.
+ *
+ * Clears the history, ongoing predictions and resets the internal state.
  */
 enum RecognizerStatus gesture_recognizer_reset(struct GestureRecognizer_RES_X__RES_Y__HISTORY_SIZE *gesture_recognizer,
                                                struct RecognizerParams params,
@@ -280,19 +284,19 @@ enum RecognizerStatus gesture_recognizer_reset(struct GestureRecognizer_RES_X__R
 /**
  * Updates the gesture recognizer with a new measurement and time.
  *
- * The time in the measurement must be monotonically increasing (usually coming from a systick timer)
+ * The time in the measurement must be monotonically increasing (usually coming from a systick timer).
  */
 enum RecognizerStatus gesture_recognizer_update(struct GestureRecognizer_RES_X__RES_Y__HISTORY_SIZE *gesture_recognizer,
                                                 struct SensorMeasurement_RES_X__RES_Y measurement,
                                                 struct RecognizerResult *gesture_result);
 
 /**
- * Converts cartesian to spherical coordinates
+ * Converts cartesian to spherical coordinates.
  */
 struct CoordsSpherical coords_spherical_from_cartesian(struct CoordsCartesian coords_cart);
 
 /**
- * Converts spherical to cartesian coordinates
+ * Converts spherical to cartesian coordinates.
  */
 struct CoordsCartesian coords_cartesian_from_spherical(struct CoordsSpherical coords_spher);
 
